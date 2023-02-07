@@ -86,7 +86,7 @@ void	linkedListTest()
 void	fillBuffer(gfxBuffer *graphic_buffer, int fill_seed)
 //------------------
 {
-	hdr_pixel pixel;
+	Ccolor_4f pixel;
 	int	x,y, size_x, size_y;
 
 	size_x = graphic_buffer->getBufferSizeX(), 
@@ -104,7 +104,7 @@ void	fillBuffer(gfxBuffer *graphic_buffer, int fill_seed)
 			pixel.greenValue = unsignedCharToFloat((unsigned char)(fill_seed + (x * y * 255) / (size_x * size_y)));
 			pixel.blueValue = unsignedCharToFloat((unsigned char)(fill_seed + (x * 255) / size_x));
 			pixel.alphaValue = unsignedCharToFloat(255);
-			graphic_buffer->putHdrPixel(x,y, &pixel);
+			graphic_buffer->putPixel(x,y, pixel);
 		}
 	}
 

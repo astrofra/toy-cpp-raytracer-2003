@@ -34,7 +34,7 @@ void	rawTrace()
 {
 	// 2D Datas
 	gfxBuffer *graphic_buffer;
-	hdr_pixel pixel, sub_pixel;
+	Ccolor_4f pixel, sub_pixel;
 	int		x,y, i;
 	const int	sampling_rate = 64;
 	const float	sub_pixel_offset = 0.95f, sub_pixel_weight = 1.0f / sampling_rate;
@@ -54,9 +54,9 @@ void	rawTrace()
 	new_sphere->center.x	= 150.0f;
 	new_sphere->center.y	= 0.0f;
 	new_sphere->center.z	= 80.0f;
-	new_sphere->radius		= 110.0f;
-	new_sphere->diffuse_color.redValue		= 1.0f;
-	new_sphere->diffuse_color.greenValue	= 0.25f;
+	new_sphere->radius		= 150.0f;
+	new_sphere->diffuse_color.redValue		= 0.15f;
+	new_sphere->diffuse_color.greenValue	= 1.0f;
 	new_sphere->diffuse_color.blueValue		= 0.15f;
 	new_sphere->diffuse_color.alphaValue	= 1.0f;
 	sphere_list->insertItem(new_sphere);
@@ -111,7 +111,7 @@ void	rawTrace()
 	{
 		for(y = -RENDER_BUFFER_SIZE_Y / 2; y < RENDER_BUFFER_SIZE_Y / 2; y++)
 		{
-			memset(&pixel, 0, sizeof(hdr_pixel));
+			memset(&pixel, 0, sizeof(Ccolor_4f));
 			for (i = 0; i <= sampling_rate; i++)
 			{
 				ray.origin.x = (float)0;
@@ -127,7 +127,7 @@ void	rawTrace()
 				pixel.blueValue		+=	sub_pixel.blueValue * sub_pixel_weight;
 				pixel.alphaValue	+=	sub_pixel.alphaValue * sub_pixel_weight;
 			}
-			graphic_buffer->putHdrPixel(x + RENDER_BUFFER_SIZE_X / 2, y + RENDER_BUFFER_SIZE_Y / 2, &pixel);
+			graphic_buffer->putPixel(x + RENDER_BUFFER_SIZE_X / 2, y + RENDER_BUFFER_SIZE_Y / 2, pixel);
 		}
 	}
 
@@ -142,7 +142,7 @@ void	rawTrace()
 }
 
 //---------------------------
-hdr_pixel	traceRay(vector	I, itemList *object_list)
+Ccolor_4f	traceRay(vector	I, itemList *object_list)
 //---------------------------
 {
 	vector		L, P, N;
@@ -150,7 +150,7 @@ hdr_pixel	traceRay(vector	I, itemList *object_list)
 
 	sphere		*object_hit;
 
-	hdr_pixel	trace_result;
+	Ccolor_4f	trace_result;
 
 	object_list->gotoListHead();
 

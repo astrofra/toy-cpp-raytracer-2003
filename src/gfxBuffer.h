@@ -10,18 +10,31 @@
 
 #define	GFXBUFFER_MAX_BLUR_RADIUS	64
 
-//-------- pixels ------------------------
+//-------- colors ------------------------
 
-struct ldr_pixel
+class Ccolor_4c
 {
+public:
 	unsigned char	redValue;
 	unsigned char	greenValue;
 	unsigned char	blueValue;
 	unsigned char	alphaValue;
 };
 
-struct hdr_pixel
+class Ccolor_4f
 {
+public:
+	Ccolor_4f();
+	Ccolor_4f(float );
+	Ccolor_4f(float ,float ,float);
+	Ccolor_4f(float ,float ,float, float);
+
+	~Ccolor_4f();
+
+	Ccolor_4f		operator+= (Ccolor_4f&);
+	Ccolor_4f		operator-= (Ccolor_4f&);
+	Ccolor_4f		operator*= (Ccolor_4f&);
+
 	float	redValue;
 	float	greenValue;
 	float	blueValue;
@@ -44,13 +57,13 @@ class	gfxBuffer
 
 		gfxBuffer		*duplicateBuffer();
 
-		void			putHdrPixel(int, int, hdr_pixel *);
-		hdr_pixel		getHdrPixel(int, int);
+		void			putPixel(int, int, Ccolor_4f&);
+		Ccolor_4f		getPixel(int, int);
 
-		gfxBuffer		operator+= (gfxBuffer *);
-		gfxBuffer		operator+= (hdr_pixel);
-		gfxBuffer		operator*= (gfxBuffer *);
-		gfxBuffer		operator*= (hdr_pixel);
+		gfxBuffer		operator+= (gfxBuffer&);
+		gfxBuffer		operator+= (Ccolor_4f&);
+		gfxBuffer		operator*= (gfxBuffer&);
+		gfxBuffer		operator*= (Ccolor_4f&);
 
 		// buffer filtering
 		void			filterBoxBlur(int); // blur_radius
@@ -63,10 +76,10 @@ class	gfxBuffer
 		int				loadFileTarga(char *);
 
 	private:
-		hdr_pixel		*buffer;
+		Ccolor_4f		*buffer;
 		int				size_x, size_y;
 
-		hdr_pixel		*getHdrPixelPointer(int , int );
+		Ccolor_4f		*getPixelPointer(int , int );
 
 };
 

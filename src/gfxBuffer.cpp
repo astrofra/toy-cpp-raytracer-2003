@@ -5,6 +5,52 @@
 #include "gfxBuffer.h"
 #include "tools.h"
 
+//------------------------
+
+//--------------------
+Ccolor_4f::Ccolor_4f()
+//--------------------
+{
+	redValue = greenValue = blueValue = 0.0;
+	alphaValue = 1.0;
+};
+
+//---------------------------
+Ccolor_4f::Ccolor_4f(float c)
+//---------------------------
+{
+	redValue = greenValue = blueValue = c;
+	alphaValue = 1.0;
+};
+
+//-------------------------------------------
+Ccolor_4f::Ccolor_4f(float r,float g,float b)
+//-------------------------------------------
+{
+	redValue	= r;
+	greenValue	= g,
+	blueValue	= b;
+	alphaValue	= 1.0;
+};
+
+//----------------------------------------------------
+Ccolor_4f::Ccolor_4f(float r,float g,float b, float a)
+//----------------------------------------------------
+{
+	redValue	= r;
+	greenValue	= g,
+	blueValue	= b;
+	alphaValue	= a;
+};
+
+//----------
+Ccolor_4f::~Ccolor_4f()
+//----------
+{
+};
+
+//------------------------
+
 //--------------------
 gfxBuffer::gfxBuffer()
 //--------------------
@@ -20,7 +66,7 @@ gfxBuffer::gfxBuffer(int req_size_x,int req_size_y)
 {	
 	size_x = req_size_x;
 	size_y = req_size_y;
-	buffer = new hdr_pixel[size_x * size_y];
+	buffer = new Ccolor_4f[size_x * size_y];
 }
 
 //--------------------
@@ -32,7 +78,7 @@ gfxBuffer::~gfxBuffer()
 }
 
 //----------------------------------------------------
-inline hdr_pixel *gfxBuffer::getHdrPixelPointer(int x, int y)
+inline Ccolor_4f *gfxBuffer::getPixelPointer(int x, int y)
 //----------------------------------------------------
 {
 	return (&buffer[x + y * size_x]);
@@ -65,25 +111,25 @@ int	gfxBuffer::isEmpty()
 
 
 //-----------------------------------------------------------
-void	gfxBuffer::putHdrPixel(int x, int y, hdr_pixel *pixel)
+void	gfxBuffer::putPixel(int x, int y, Ccolor_4f &pixel)
 //-----------------------------------------------------------
 {
-	hdr_pixel *tmp;
-	tmp = getHdrPixelPointer(x,y);
+	Ccolor_4f *tmp;
+	tmp = getPixelPointer(x,y);
 
-	tmp->redValue = pixel->redValue;
-	tmp->greenValue = pixel->greenValue;
-	tmp->blueValue = pixel->blueValue;
-	tmp->alphaValue = pixel->alphaValue;
+	tmp->redValue = pixel.redValue;
+	tmp->greenValue = pixel.greenValue;
+	tmp->blueValue = pixel.blueValue;
+	tmp->alphaValue = pixel.alphaValue;
 }
 
 //----------------------------------------------
-hdr_pixel	gfxBuffer::getHdrPixel(int x, int y)
+Ccolor_4f	gfxBuffer::getPixel(int x, int y)
 //----------------------------------------------
 {
-	hdr_pixel pixel;
-	hdr_pixel *tmp;
-	tmp = getHdrPixelPointer(x,y);
+	Ccolor_4f pixel;
+	Ccolor_4f *tmp;
+	tmp = getPixelPointer(x,y);
 
 	pixel.redValue = tmp->redValue;
 	pixel.greenValue = tmp->greenValue;
@@ -103,7 +149,7 @@ gfxBuffer	*gfxBuffer::duplicateBuffer()
 	temp_buffer = new gfxBuffer(size_x, size_y);
 
 	// copy buffer datas 
-	memcpy(temp_buffer->buffer, buffer, sizeof(hdr_pixel) * size_x * size_y);
+	memcpy(temp_buffer->buffer, buffer, sizeof(Ccolor_4f) * size_x * size_y);
 	
 	temp_buffer->size_x = getBufferSizeX();
 	temp_buffer->size_y = getBufferSizeY();
@@ -118,7 +164,7 @@ void	gfxBuffer::filterBoxBlur(int blur_radius)
 	int			x,y;
 	int			kernel_x, kernel_y, bounded_x, bounded_y;
 	float		blur_weight;
-	hdr_pixel	read_pixel, blured_pixel;
+	Ccolor_4f	read_pixel, blured_pixel;
 	gfxBuffer	*temp_buffer;
 
 	// create temp buffer as un-blured reference
@@ -142,7 +188,7 @@ void	gfxBuffer::filterBoxBlur(int blur_radius)
 		for(x = 0; x < size_x; x++)
 		{
 			// clear blured pixel
-			memset(&blured_pixel,0,sizeof(hdr_pixel));
+			memset(&blured_pixel,0,sizeof(Ccolor_4f));
 
 			// BoxBlur loop
 			for (kernel_y = y - blur_radius; kernel_y < y + blur_radius; kernel_y++)
@@ -151,7 +197,7 @@ void	gfxBuffer::filterBoxBlur(int blur_radius)
 				for (kernel_x = x - blur_radius; kernel_x < x + blur_radius; kernel_x++)
 				{
 					bounded_x = BOUND_VALUE(kernel_x, 0, size_x - 1);
-					read_pixel = temp_buffer->getHdrPixel(bounded_x, bounded_y);
+					read_pixel = temp_buffer->getPixel(bounded_x, bounded_y);
 
 					blured_pixel.redValue	+=	read_pixel.redValue * blur_weight;
 					blured_pixel.greenValue	+=	read_pixel.greenValue * blur_weight;
@@ -160,7 +206,7 @@ void	gfxBuffer::filterBoxBlur(int blur_radius)
 				}
 			}
 			// loop end, write down blured pixel
-			putHdrPixel( x, y, &blured_pixel);
+			putPixel( x, y, blured_pixel);
 		}
 		//printf("gfxBuffer::filterGaussianBlur : line %i done.\n",y);
 	}
@@ -179,12 +225,12 @@ int gfxBuffer::saveFileTarga(char *fname)
 
 	FILE *fp;
 	targa_header *header;
-	ldr_pixel	*ldr_buffer, *ldr_pt;
-	hdr_pixel	*hdr_pt;
+	Ccolor_4c	*ldr_buffer, *ldr_pt;
+	Ccolor_4f	*hdr_pt;
 	int	x,y;
 
 	// prepare 32bits int. buffer
-	ldr_buffer = new ldr_pixel[size_x * size_y];
+	ldr_buffer = new Ccolor_4c[size_x * size_y];
 
 	//copy hdr buffer to ldr buffer
 	for(y = 0; y < size_y; y++)
@@ -192,7 +238,7 @@ int gfxBuffer::saveFileTarga(char *fname)
 		for (x = 0; x < size_x; x++)
 		{
 			ldr_pt = &ldr_buffer[x + y * size_x];
-			hdr_pt = getHdrPixelPointer(x,y);
+			hdr_pt = getPixelPointer(x,y);
 			ldr_pt->redValue	=	floatToUnsignedChar( hdr_pt->redValue );
 			ldr_pt->greenValue	=	floatToUnsignedChar( hdr_pt->greenValue );
 			ldr_pt->blueValue	=	floatToUnsignedChar( hdr_pt->blueValue );
@@ -247,8 +293,8 @@ int gfxBuffer::loadFileTarga(char *fname)
 
 	FILE *fp;
 	targa_header *header;
-	ldr_pixel	*ldr_buffer, *ldr_pt;
-	hdr_pixel	*hdr_pt;
+	Ccolor_4c	*ldr_buffer, *ldr_pt;
+	Ccolor_4f	*hdr_pt;
 	int	x,y;
 
 	// open the targa file
@@ -292,10 +338,10 @@ int gfxBuffer::loadFileTarga(char *fname)
 	}
 	
 	// allocate a 32bits int. buffer
-	ldr_buffer = new ldr_pixel[size_x * size_y];
+	ldr_buffer = new Ccolor_4c[size_x * size_y];
 
 	// allocate the main hdr buffer
-	buffer = new hdr_pixel[size_x * size_y],
+	buffer = new Ccolor_4f[size_x * size_y],
 
 	// get image datas
 	fread(ldr_buffer, size_x * size_y * GFXBUFFER_DEPTH_RGB32, 1, fp );
@@ -306,7 +352,7 @@ int gfxBuffer::loadFileTarga(char *fname)
 		for (x = 0; x < size_x; x++)
 		{
 			ldr_pt = &ldr_buffer[x + y * size_x];
-			hdr_pt = getHdrPixelPointer(x,y);
+			hdr_pt = getPixelPointer(x,y);
 
 			hdr_pt->redValue	=	unsignedCharToFloat( ldr_pt->redValue );
 			hdr_pt->greenValue	=	unsignedCharToFloat( ldr_pt->greenValue );
