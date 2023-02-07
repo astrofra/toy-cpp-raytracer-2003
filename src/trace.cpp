@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 //------------------------------
 {
 	
-	targaInputOutputTest();
+	//targaInputOutputTest();
 	//linkedListTest();
 	rawTrace();
 	return 0;
@@ -36,7 +36,7 @@ void	rawTrace()
 	gfxBuffer *graphic_buffer;
 	hdr_pixel pixel, sub_pixel;
 	int		x,y, i;
-	const int	sampling_rate = 16;
+	const int	sampling_rate = 64;
 	const float	sub_pixel_offset = 0.95f, sub_pixel_weight = 1.0f / sampling_rate;
 
 	// 3D datas
@@ -54,7 +54,7 @@ void	rawTrace()
 	new_sphere->center.x	= 150.0f;
 	new_sphere->center.y	= 0.0f;
 	new_sphere->center.z	= 80.0f;
-	new_sphere->radius		= 80.0f;
+	new_sphere->radius		= 110.0f;
 	new_sphere->diffuse_color.redValue		= 1.0f;
 	new_sphere->diffuse_color.greenValue	= 0.25f;
 	new_sphere->diffuse_color.blueValue		= 0.15f;
@@ -73,13 +73,24 @@ void	rawTrace()
 	sphere_list->insertItem(new_sphere);
 
 	new_sphere = new sphere; // sphere #3
-	new_sphere->center.x	= -150.0f;
+	new_sphere->center.x	= -100.0f;
 	new_sphere->center.y	= 0.0f;
 	new_sphere->center.z	= 80.0f;
-	new_sphere->radius		= 100.0f;
+	new_sphere->radius		= 110.0f;
 	new_sphere->diffuse_color.redValue		= 0.15f;
 	new_sphere->diffuse_color.greenValue	= 0.25f;
 	new_sphere->diffuse_color.blueValue		= 1.0f;
+	new_sphere->diffuse_color.alphaValue	= 1.0f;
+	sphere_list->insertItem(new_sphere);
+
+	new_sphere = new sphere; // sphere #4
+	new_sphere->center.x	= 0.0f;
+	new_sphere->center.y	= -80.0f;
+	new_sphere->center.z	= 80.0f;
+	new_sphere->radius		= 100.0f;
+	new_sphere->diffuse_color.redValue		= 0.20f;
+	new_sphere->diffuse_color.greenValue	= 0.20f;
+	new_sphere->diffuse_color.blueValue		= 0.20f;
 	new_sphere->diffuse_color.alphaValue	= 1.0f;
 	sphere_list->insertItem(new_sphere);
 
@@ -122,9 +133,9 @@ void	rawTrace()
 
 	graphic_buffer->saveFileTarga("trace.tga");
 
-	graphic_buffer->filterBoxBlur(8);
+	//graphic_buffer->filterBoxBlur(8);
 
-	graphic_buffer->saveFileTarga("trace_blured.tga");
+	//graphic_buffer->saveFileTarga("trace_blured.tga");
 
 	delete graphic_buffer;
 
@@ -134,7 +145,8 @@ void	rawTrace()
 hdr_pixel	traceRay(vector	I, itemList *object_list)
 //---------------------------
 {
-	float		d; //, z_hit;
+	vector		L, P, N;
+	float		d,  z_hit, diff; //, spec;
 
 	sphere		*object_hit;
 
@@ -142,50 +154,86 @@ hdr_pixel	traceRay(vector	I, itemList *object_list)
 
 	object_list->gotoListHead();
 
-	//z_hit = 0.0f;
+	object_hit = 0;
+	z_hit = 999999999.0f;
 
 	while(object_list->gotoNextItem())
 	{
 		d = sphereIntersect(I, (sphere *)object_list->getContent());
 
-		if (d > 0.0f)
+		if (d != 0.0f && d < z_hit)
 		{
-			//printf("%f\n",d);
+			z_hit = d;
 			object_hit = (sphere *)object_list->getContent();
-			break;
 		}
-
 	}
 
-	if (d > 0.0f)
+	if (object_hit != 0)
 	{	
 		// shading
-		/*
-		N.origin.x = sphere_center.x;
-		N.origin.y = sphere_center.y;
-		N.origin.z = sphere_center.z;
 
-		N.direction.x = sphere_center.x;
-		N.direction.y = sphere_center.y;
-		N.direction.z = sphere_center.z;
-		*/
-		//d = qSQR(d);
-		d = 3.0f * d - 2.0f;
-		trace_result.redValue	= object_hit->diffuse_color.redValue * d;
-		trace_result.greenValue	= object_hit->diffuse_color.greenValue * d;
-		trace_result.blueValue	= object_hit->diffuse_color.blueValue * d;
-		trace_result.alphaValue	= object_hit->diffuse_color.alphaValue * d;
+		// intersection point
+		
+		P.origin.x = I.origin.x + I.direction.x * z_hit;
+		P.origin.y = I.origin.y + I.direction.y * z_hit;
+		P.origin.z = I.origin.z + I.direction.z * z_hit;  
+
+		// sphere normal @ intersection point
+		N.origin.x = 0;
+		N.origin.y = 0;
+		N.origin.z = 0;
+
+		N.direction.x = ( P.origin.x - object_hit->center.x ) / object_hit->radius;
+		N.direction.y = ( P.origin.y - object_hit->center.y ) / object_hit->radius;
+		N.direction.z = ( P.origin.z - object_hit->center.z ) / object_hit->radius;
+
+		// distant light vector
+		L.origin.x = 0.0f;
+		L.origin.y = 0.0f;
+		L.origin.z = 0.0f;
+
+		L.direction.x = -0.4f;
+		L.direction.y = 0.4f;
+		L.direction.z = -0.4f;
+
+		// diffuse
+		diff = dotProduct(L, N);
+
+		trace_result.redValue	= object_hit->diffuse_color.redValue * diff; 
+		trace_result.greenValue	= object_hit->diffuse_color.greenValue * diff; 
+		trace_result.blueValue	= object_hit->diffuse_color.blueValue * diff; 
+
+		trace_result.alphaValue	= object_hit->diffuse_color.alphaValue; 
 	}
 	else
 	{
 		// background
-		trace_result.redValue = 0.0f;
-		trace_result.greenValue = 0.0f;
-		trace_result.blueValue = 0.0f;
+		trace_result.redValue = 0.20f;
+		trace_result.greenValue = 0.20f;
+		trace_result.blueValue = 0.20f;
 		trace_result.alphaValue = 0.0f;
 	}
 
 	return (trace_result);
+
+}
+
+//----------------------------------
+float dotProduct(vector	a, vector b)
+//----------------------------------
+{
+	float	ax, ay, az,
+			bx, by, bz;
+
+	ax = a.direction.x - a.origin.x;
+	ay = a.direction.y - a.origin.y;
+	az = a.direction.z - a.origin.z;
+
+	bx = b.direction.x - b.origin.x;
+	by = b.direction.y - b.origin.y;
+	bz = b.direction.z - b.origin.z;
+
+	return (ax * bx + ay * by + az * bz);
 
 }
 
@@ -210,7 +258,7 @@ float	sphereIntersect(vector	ray, sphere *tested_sphere)
        + qSQR( (ray.origin.z - spherez) ) - qSQR(radius) );
    d = qSQR(b) - 4 * a * c;
 
-	if (d > 0)
+	if (d >= 0)
 	{
 		t1 = (float)(-b + sqrt(d)) / (2 * a);
 		t2 = (float)(-b - sqrt(d)) / (2 * a);
@@ -222,10 +270,8 @@ float	sphereIntersect(vector	ray, sphere *tested_sphere)
 	else
 	{
 		//printf("No Intersection sphere/ray found\n");
-		return	-1.0;
+		return	0.0;
 	}
 
 
 }
-
-

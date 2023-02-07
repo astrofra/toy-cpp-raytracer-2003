@@ -31,5 +31,6 @@ struct vector
 void		rawTrace();
 hdr_pixel	traceRay(vector	, itemList *);
 float		sphereIntersect(vector, sphere *);
+float dotProduct(vector	, vector );
 
 #endif
