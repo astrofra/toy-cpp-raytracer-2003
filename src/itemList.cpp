@@ -1,24 +1,25 @@
 // itemList.cpp
 #include <memory.h>
+#include <stdio.h>
 
 #include "itemList.h"
 #include "gfxBuffer.h"
+
+//-------- itemList ------------------------
 
 //------------------
 itemList::itemList()
 //------------------
 {
-	first = 0;
+	current = head = new item;
+	head->next = 0;
 }
 
 //-------------------
 itemList::~itemList()
 //-------------------
 {
-	//if (this->getNextItem(first->next) != 0)
-	//	delete(this->getNextItem(first->next));
-
-	//delete (this->tmp);
+//
 }
 
 
@@ -26,43 +27,83 @@ itemList::~itemList()
 void	itemList::insertItem(void *new_content)
 //--------------------------------
 {
-	item	*new_item, *tmp;
+	item	*new_item;
 	new_item = new item;
 	
-	new_item->content = new_content;
-
-	tmp = first;
-	first = new_item;
-	new_item->next = tmp;
+	new_item->content = new_content;	
+	new_item->next = current->next;
+	current->next = new_item;
 }
 
 //----------------------------------
-void	itemList::removeItem(item *)
+void	itemList::removeItem()
 //----------------------------------
+// Remove item next to current
 {
+	item *temp;
+
+	if (current != head)
+	{
+		temp = current->next;
+		current->next = temp->next;
+		temp->next = 0;
+		delete	temp->content; // problem?
+		delete	temp;
+	}
+
 }
 
 //------------------------------------
-item	*itemList::getNextItem(item *req_item)
+item	*itemList::gotoNextItem()
 //------------------------------------
 {
-	if (first == 0) return 0;
+	printf("gotoNextItem() : %i\n", current);
+	return (current = current->next);
+}
 
-	return (req_item->next);
+//-------------------------------
+item	*itemList::gotoPrevItem()
+//-------------------------------
+{
+	item *temp;
+	temp = head;
+
+	printf("gotoPrevItem() : %i\n", current);
+	if (current != head->next)
+	{
+		while((temp != 0) && (temp->next != current))
+		{
+			temp = temp->next;
+		}
+		current = temp;
+		return (current);
+	}
+	else
+	{
+		return (0);
+	}
+
+}
+
+//-------------------------------
+item	*itemList::gotoFirstItem()
+//-------------------------------
+{
+	return	(current = head->next);
 }
 
 
 //-------------------------------
-item	*itemList::getFirstItem()
+item	*itemList::gotoListHead()
 //-------------------------------
 {
-	return	(first->next);
+	return	(current = head);
 }
 
 
 //-----------------------------------------------
-void	*itemList::getContent(item *req_item)
+void	*itemList::getContent()
 //-----------------------------------------------
 {
-	return	(req_item->content);
+	return	(current->content);
 }

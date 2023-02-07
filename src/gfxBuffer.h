@@ -31,6 +31,24 @@ struct rgba_pixel
 	unsigned char	alphaValue;
 };
 
+/*
+class pixel
+{
+public:
+	float	redValue:
+	float	greenValue;
+	float	blueValue;
+	float	alphaValue;
+
+	pixel();
+	pixel(float, float, float);
+ 	pixel(float, float, float, float);
+	~pixel();
+
+	//	class friend gfxBuffer;
+}
+*/
+
 class	gfxBuffer
 {
 	public:

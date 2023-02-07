@@ -5,11 +5,17 @@
 #ifndef	ITEM_LIST
 #define ITEM_LIST
 
-struct item
+//-------- item ------------------------
+
+class item
 {
 	void	*content;
 	item	*next;
+	
+	friend class itemList;
 };
+
+//-------- itemList ------------------------
 
 class	itemList
 {
@@ -17,13 +23,16 @@ public:
 	itemList();
 	~itemList();
 	void	insertItem(void *);
-	item	*getNextItem(item *);
-	item	*getFirstItem();
-	void	*getContent(item *);
-	void	removeItem(item *);
+	item	*gotoListHead();
+	item	*gotoNextItem();
+	item	*gotoPrevItem();
+	item	*gotoFirstItem();
+	void	*getContent();
+	void	removeItem();
 
 private:
-	item	*first;
+	item	*head;
+	item	*current;
 
 };
 

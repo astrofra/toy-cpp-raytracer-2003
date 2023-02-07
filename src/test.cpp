@@ -13,33 +13,38 @@ void	linkedListTest()
 {
 	int			i;
 	char		str[1024];	
-	itemList	*buffer_list;
-	item		*tmp;
+	itemList	buffer_list;
+//	item		*tmp;
 	gfxBuffer	*temp_buffer;
 
-	// List instance creation
-	buffer_list = new itemList();
-
 	// List items creation
-	for(i = 0; i < 15; i++)
+	for(i = 1; i <= 16; i++)
 	{
 		temp_buffer	= new gfxBuffer(i * 40, i * 30);
-		buffer_list->insertItem(temp_buffer);
+		buffer_list.insertItem(temp_buffer);
 		fillBuffer(temp_buffer, i * 128);
 	}
 
-	tmp = buffer_list->getFirstItem();
 
 	i = 0;
-	while(true)
+	buffer_list.gotoListHead();
+	while(buffer_list.gotoNextItem())
 	{
-		sprintf(str, "f:\\\\out_%i.tga", i + 10);
-		temp_buffer = (gfxBuffer *)tmp->content;
-		temp_buffer->saveBuffer(str);
+		sprintf(str, "J:\\temp\\out_%i.tga", i + 10);
 
-		tmp = tmp->next;
+		temp_buffer = (gfxBuffer *)buffer_list.getContent();
+		temp_buffer->saveBuffer(str);
 		i++;
-		if (tmp->next == 0) break;
+	}
+
+	
+	while(buffer_list.gotoPrevItem())
+	{
+		i--;
+		sprintf(str, "J:\\temp\\out_reverse_%i.tga", i + 10);
+
+		temp_buffer = (gfxBuffer *)buffer_list.getContent();
+		temp_buffer->saveBuffer(str);
 	}
 
 
