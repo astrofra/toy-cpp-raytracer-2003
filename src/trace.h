@@ -20,7 +20,7 @@ struct vector
 };
 
 void		rawTrace();
-rgba_pixel	traceRay(vector );
+hdr_pixel	traceRay(vector );
 float		sphereIntersect(vector, point, float);
 
 #endif

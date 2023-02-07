@@ -18,8 +18,9 @@ int main(int argc, char* argv[])
 //------------------------------
 {
 	
-	linkedListTest();
-	// rawTrace();
+	targaInputOutputTest();
+	//linkedListTest();
+	//rawTrace();
 	return 0;
 }
 
@@ -30,7 +31,7 @@ void	rawTrace()
 {
 	// 2D Datas
 	gfxBuffer *graphic_buffer;
-	rgba_pixel pixel;
+	hdr_pixel pixel;
 	int	x,y;
 
 	// 3D datas
@@ -51,23 +52,23 @@ void	rawTrace()
 			ray.direction.y = (float)y;
 			ray.direction.z = (float)256;
 			pixel = traceRay(ray);
-			graphic_buffer->putRGBAPixel(x + RENDER_BUFFER_SIZE_X / 2, y + RENDER_BUFFER_SIZE_Y / 2, pixel);
+			graphic_buffer->putHdrPixel(x + RENDER_BUFFER_SIZE_X / 2, y + RENDER_BUFFER_SIZE_Y / 2, &pixel);
 		}
 	}
 
-		graphic_buffer->saveBuffer("f:\\trace.tga");
+		graphic_buffer->saveFileTarga("f:\\trace.tga");
 
 	delete graphic_buffer;
 
 }
 
 //---------------------------
-rgba_pixel	traceRay(vector	I)
+hdr_pixel	traceRay(vector	I)
 //---------------------------
 {
 	float	d;
 	point	sphere_center;
-	rgba_pixel	trace_result;
+	hdr_pixel	trace_result;
 	//vector	N;
 
 	sphere_center.x = 64.0;
