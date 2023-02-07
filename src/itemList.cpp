@@ -19,7 +19,7 @@ itemList::itemList()
 itemList::~itemList()
 //-------------------
 {
-//
+// hem
 }
 
 
@@ -47,7 +47,7 @@ void	itemList::removeItem()
 		temp = current->next;
 		current->next = temp->next;
 		temp->next = 0;
-		delete	temp->content; // problem?
+		delete	temp->content; // ??
 		delete	temp;
 	}
 
@@ -57,7 +57,7 @@ void	itemList::removeItem()
 item	*itemList::gotoNextItem()
 //------------------------------------
 {
-	printf("itemList::gotoNextItem() : %i\n", current);
+	//printf("itemList::gotoNextItem() : %i\n", current);
 	return (current = current->next);
 }
 
@@ -68,7 +68,7 @@ item	*itemList::gotoPrevItem()
 	item *temp;
 	temp = head;
 
-	printf("itemList::gotoPrevItem() : %i\n", current);
+	//printf("itemList::gotoPrevItem() : %i\n", current);
 	if (current != head->next)
 	{
 		while((temp != 0) && (temp->next != current))

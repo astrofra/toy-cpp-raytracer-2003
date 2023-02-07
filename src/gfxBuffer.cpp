@@ -9,8 +9,8 @@
 gfxBuffer::gfxBuffer()
 //--------------------
 {	
-	size_x = -1;
-	size_y = -1;
+	size_x = 0;
+	size_y = 0;
 	buffer = 0;
 }
 
@@ -121,17 +121,19 @@ void	gfxBuffer::filterBoxBlur(int blur_radius)
 	hdr_pixel	read_pixel, blured_pixel;
 	gfxBuffer	*temp_buffer;
 
-	if (blur_radius > GFXBUFFER_MAX_BLUR_RADIUS)
-	{
-		printf("gfxBuffer::filterGaussianBlur : MAX_BLUR_RADIUS exceeded\n");
-		blur_radius = GFXBUFFER_MAX_BLUR_RADIUS;
-	}
-
 	// create temp buffer as un-blured reference
 	temp_buffer = duplicateBuffer();
 
-	blur_weight = (float)(1.0f / (4.0f * (float)blur_radius * (float)blur_radius));
+	if (blur_radius <=0)
+		return;
 
+	if (blur_radius > GFXBUFFER_MAX_BLUR_RADIUS)
+	{
+		printf("gfxBuffer::filterBoxBlur : MAX_BLUR_RADIUS exceeded\n");
+		blur_radius = GFXBUFFER_MAX_BLUR_RADIUS;
+	}
+
+	blur_weight = (float)(1.0f / (4.0f * (float)blur_radius * (float)blur_radius));
 	printf("gfxBuffer::filterBoxBlur : blur_radius = %i, blur_weight = %f.\n", blur_radius, blur_weight);
 
 	// image loop

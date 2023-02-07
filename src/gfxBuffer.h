@@ -1,3 +1,5 @@
+#include "tools.h"
+
 #ifndef	GFXBUFFER
 #define	GFXBUFFER
 
@@ -8,22 +10,7 @@
 
 #define	GFXBUFFER_MAX_BLUR_RADIUS	64
 
-struct targa_header
-{
-    unsigned char  identsize;			// size of ID field that follows 18 byte header (0 usually)
-    unsigned char  colourmaptype;		// type of colour map 0=none, 1=has palette
-    unsigned char  imagetype;			// type of image 0=none,1=indexed,2=rgb,3=grey,+8=rle packed
-
-	unsigned char  pad[5];
-
-    unsigned short xstart;				// image x origin
-    unsigned short ystart;				// image y origin
-    unsigned short width;				// image width in pixels
-    unsigned short height;				// image height in pixels
-    unsigned char  bits;				// image bits per pixel 8,16,24,32
-    unsigned char  descriptor;			// image descriptor bits (vh flip bits)
-
-};
+//-------- pixels ------------------------
 
 struct ldr_pixel
 {
@@ -33,7 +20,6 @@ struct ldr_pixel
 	unsigned char	alphaValue;
 };
 
-
 struct hdr_pixel
 {
 	float	redValue;
@@ -41,6 +27,8 @@ struct hdr_pixel
 	float	blueValue;
 	float	alphaValue;
 };
+
+//-------- gfxBuffer ------------------------
 
 class	gfxBuffer
 {
@@ -59,8 +47,14 @@ class	gfxBuffer
 		void			putHdrPixel(int, int, hdr_pixel *);
 		hdr_pixel		getHdrPixel(int, int);
 
-		// pixel filtering
-		void			filterBoxBlur(int);
+		gfxBuffer		operator+= (gfxBuffer *);
+		gfxBuffer		operator+= (hdr_pixel);
+		gfxBuffer		operator*= (gfxBuffer *);
+		gfxBuffer		operator*= (hdr_pixel);
+
+		// buffer filtering
+		void			filterBoxBlur(int); // blur_radius
+		void			filterBloom(float, int); // bloom_threshold, bloom_radius
 		void			filterInvertRGB();
 		void			filterInvertAlpha();
 

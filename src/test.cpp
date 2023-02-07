@@ -18,18 +18,18 @@ void	targaInputOutputTest()
 
 	in_buffer = new gfxBuffer();
 
-	in_buffer->loadFileTarga("J:\\temp\\in.tga");
+	in_buffer->loadFileTarga("in.tga");
 	
-	for(i = 1; i <= 32; i *= 2)
+	for(i = 1; i <= 16; i *= 2)
 	{
 		blured_buffer = in_buffer->duplicateBuffer();
 
 		blured_buffer->filterBoxBlur(i);
 		
 		if (i < 9)
-			sprintf(&fname[0], "J:\\temp\\out_blur_strength_0%i.tga\0", i);
+			sprintf(&fname[0], "out_blur_strength_0%i.tga\0", i);
 		else
-			sprintf(&fname[0], "J:\\temp\\out_blur_strength_%i.tga\0", i);
+			sprintf(&fname[0], "out_blur_strength_%i.tga\0", i);
 
 		blured_buffer->saveFileTarga(&fname[0]);
 
