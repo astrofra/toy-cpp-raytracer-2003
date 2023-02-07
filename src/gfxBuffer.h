@@ -1,3 +1,6 @@
+#ifndef	GFXBUFFER
+#define	GFXBUFFER
+
 #define	GFXBUFFER_ERROR_BASIC	0
 #define	GFXBUFFER_NO_ERROR	1
 
@@ -11,10 +14,10 @@ struct tga_header
 
 	unsigned char  pad[5];
 
-    unsigned short xstart;						// image x origin
-    unsigned short ystart;						// image y origin
-    unsigned short width;						// image width in pixels
-    unsigned short height;						// image height in pixels
+    unsigned short xstart;				// image x origin
+    unsigned short ystart;				// image y origin
+    unsigned short width;				// image width in pixels
+    unsigned short height;				// image height in pixels
     unsigned char  bits;				// image bits per pixel 8,16,24,32
     unsigned char  descriptor;			// image descriptor bits (vh flip bits)
 
@@ -48,3 +51,5 @@ class	gfxBuffer
 		int				size_x, size_y;
 
 };
+
+#endif
