@@ -97,6 +97,10 @@ SOURCE=.\itemList.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\math.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\test.cpp
 # End Source File
 # Begin Source File
@@ -118,6 +122,10 @@ SOURCE=.\gfxBuffer.h
 # Begin Source File
 
 SOURCE=.\itemList.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\math.h
 # End Source File
 # Begin Source File
 

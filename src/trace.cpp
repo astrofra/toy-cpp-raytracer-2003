@@ -1,5 +1,13 @@
 // Trace.cpp 
-//
+
+// Simple (read 'basic') raytracer written in 3 days (3 days for that crappy spheres ?! :)
+// C++ ugly code by http://fra.dozign.com
+// Raytracer featuring spheres primitives, no shadow casting, unlimited pointlights support (wow)
+// and an improvised specular shading model ...
+
+// In no event shall the author be liable for any indirect or
+// consequential damages or loss of data resulting from use
+// or performance of this software.
 
 #undef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -36,7 +44,7 @@ void	rawTrace()
 	gfxBuffer *graphic_buffer;
 	Ccolor_4f pixel, sub_pixel;
 	int		x,y, i;
-	const int	sampling_rate = 64;
+	const int	sampling_rate = 256;
 	const float	sub_pixel_offset = 0.95f, sub_pixel_weight = 1.0f / sampling_rate;
 
 	// 3D datas
@@ -54,9 +62,9 @@ void	rawTrace()
 	new_sphere->center.x	= 150.0f;
 	new_sphere->center.y	= 0.0f;
 	new_sphere->center.z	= 80.0f;
-	new_sphere->radius		= 150.0f;
-	new_sphere->diffuse_color.redValue		= 0.15f;
-	new_sphere->diffuse_color.greenValue	= 1.0f;
+	new_sphere->radius		= 110.0f;
+	new_sphere->diffuse_color.redValue		= 1.0f;
+	new_sphere->diffuse_color.greenValue	= 0.25f;
 	new_sphere->diffuse_color.blueValue		= 0.15f;
 	new_sphere->diffuse_color.alphaValue	= 1.0f;
 	sphere_list->insertItem(new_sphere);
@@ -192,17 +200,45 @@ Ccolor_4f	traceRay(vector	I, itemList *object_list)
 		L.origin.y = 0.0f;
 		L.origin.z = 0.0f;
 
-		L.direction.x = -0.4f;
-		L.direction.y = 0.4f;
-		L.direction.z = -0.4f;
+		// diffuse 1
 
-		// diffuse
-		diff = dotProduct(L, N);
+		L.direction.x = -1.0f;
+		L.direction.y = 1.0f;
+		L.direction.z = -2.0f;
+
+		L = normalize(L);
+
+		diff = MIN_VALUE(dotProduct(L, N), 0);
 
 		trace_result.redValue	= object_hit->diffuse_color.redValue * diff; 
 		trace_result.greenValue	= object_hit->diffuse_color.greenValue * diff; 
 		trace_result.blueValue	= object_hit->diffuse_color.blueValue * diff; 
 
+		diff = (float)pow(diff, 32);
+
+		trace_result.redValue	+= object_hit->diffuse_color.redValue * diff; 
+		trace_result.greenValue	+= object_hit->diffuse_color.greenValue * diff; 
+		trace_result.blueValue	+= object_hit->diffuse_color.blueValue * diff; 
+
+		diff = (float)pow(diff, 64);
+
+		trace_result.redValue	+= diff; //object_hit->diffuse_color.redValue * diff; 
+		trace_result.greenValue	+= diff; //object_hit->diffuse_color.greenValue * diff; 
+		trace_result.blueValue	+= diff; //object_hit->diffuse_color.blueValue * diff; 
+
+		L.direction.x = 50.0f;
+		L.direction.y = -25.0f;
+		L.direction.z = 25.0f;
+
+		L = normalize(L);
+
+		diff = 2 * MIN_VALUE(dotProduct(L, N),0);
+
+		trace_result.redValue	+= object_hit->diffuse_color.redValue * diff; 
+		trace_result.greenValue	+= object_hit->diffuse_color.greenValue * diff; 
+		trace_result.blueValue	+= object_hit->diffuse_color.blueValue * diff; 
+
+		// alpha
 		trace_result.alphaValue	= object_hit->diffuse_color.alphaValue; 
 	}
 	else
@@ -216,6 +252,37 @@ Ccolor_4f	traceRay(vector	I, itemList *object_list)
 
 	return (trace_result);
 
+}
+
+float	length(vector v)
+{
+	float a,b,c, l;
+
+	a = v.direction.x - v.origin.x;
+	b = v.direction.y - v.origin.y;
+	c = v.direction.z - v.origin.z;
+
+	l = (float)sqrt(qSQR(a) + qSQR(b) + qSQR(c));
+
+	return l;
+
+}
+
+vector	normalize(vector v)
+{
+	float	l;
+	l = 1.0f / length(v);
+
+	v.direction.x -= v.origin.x;
+	v.direction.y -= v.origin.y;
+	v.direction.z -= v.origin.z;
+	v.origin.x = v.origin.y = v.origin.z = 0.0;
+
+	v.direction.x *= l;
+	v.direction.y *= l;
+	v.direction.z *= l;
+
+	return v;
 }
 
 //----------------------------------

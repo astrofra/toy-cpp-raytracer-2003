@@ -1,4 +1,10 @@
 // tools.h
+
+// C++ (ugly) code by http://fra.dozign.com
+// In no event shall the author be liable for any indirect or
+// consequential damages or loss of data resulting from use
+// or performance of this software.
+
 #include <stdlib.h>
 
 #ifndef COMMON_TOOLS

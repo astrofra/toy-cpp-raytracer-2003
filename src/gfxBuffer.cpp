@@ -1,3 +1,8 @@
+// C++ (ugly) code by http://fra.dozign.com
+// In no event shall the author be liable for any indirect or
+// consequential damages or loss of data resulting from use
+// or performance of this software.
+
 #include <memory.h>
 #include <string>
 #include <stdio.h>
@@ -48,6 +53,7 @@ Ccolor_4f::~Ccolor_4f()
 //----------
 {
 };
+
 
 //------------------------
 
