@@ -18,8 +18,8 @@ int main(int argc, char* argv[])
 //------------------------------
 {
 	
-	bufferTest();
-	rawTrace();
+	linkedListTest();
+	// rawTrace();
 	return 0;
 }
 
@@ -89,10 +89,10 @@ rgba_pixel	traceRay(vector	I)
 		N.direction.z = sphere_center.z;
 		*/
 
-		trace_result.redValue = 255 * d;
-		trace_result.greenValue = 255 * d;
-		trace_result.blueValue = 255 * d;
-		trace_result.alphaValue = 255 * d;
+		trace_result.redValue = 255;
+		trace_result.greenValue = 255;
+		trace_result.blueValue = 255;
+		trace_result.alphaValue = 255;
 	}
 	else
 	{

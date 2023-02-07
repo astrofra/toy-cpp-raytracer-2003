@@ -1,24 +1,30 @@
 // itemList.h
 
+#include "gfxBuffer.h"
+
+#ifndef	ITEM_LIST
+#define ITEM_LIST
+
 struct item
 {
-	void *pointer;
-	item *next;
+	void	*content;
+	item	*next;
 };
 
 class	itemList
 {
-	public:
-		itemList();
-		~itemList();
-		item	*addItem(void *);
-		item	*getNextItem(item *);
-		item	*getFirstItem();
-		void	*getItemPointer(item *);
-		void	removeItem(item *);
+public:
+	itemList();
+	~itemList();
+	void	insertItem(void *);
+	item	*getNextItem(item *);
+	item	*getFirstItem();
+	void	*getContent(item *);
+	void	removeItem(item *);
 
-	private:
-		item *first;
-		item *temp_pointer;
+private:
+	item	*first;
 
 };
+
+#endif

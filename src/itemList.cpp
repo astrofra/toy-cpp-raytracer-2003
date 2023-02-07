@@ -2,30 +2,38 @@
 #include <memory.h>
 
 #include "itemList.h"
+#include "gfxBuffer.h"
 
 //------------------
 itemList::itemList()
 //------------------
 {
-	memset(this, 0, sizeof(itemList));
+	first = 0;
 }
 
 //-------------------
 itemList::~itemList()
 //-------------------
 {
-	if (this->getNextItem(first->next) != 0)
-		delete(this->getNextItem(first->next));
+	//if (this->getNextItem(first->next) != 0)
+	//	delete(this->getNextItem(first->next));
 
-	delete (this->temp_pointer);
+	//delete (this->tmp);
 }
 
 
 //--------------------------------
-item	*itemList::addItem(void *)
+void	itemList::insertItem(void *new_content)
 //--------------------------------
 {
-	return 0;
+	item	*new_item, *tmp;
+	new_item = new item;
+	
+	new_item->content = new_content;
+
+	tmp = first;
+	first = new_item;
+	new_item->next = tmp;
 }
 
 //----------------------------------
@@ -35,10 +43,12 @@ void	itemList::removeItem(item *)
 }
 
 //------------------------------------
-item	*itemList::getNextItem(item *)
+item	*itemList::getNextItem(item *req_item)
 //------------------------------------
 {
-	return 0;
+	if (first == 0) return 0;
+
+	return (req_item->next);
 }
 
 
@@ -51,8 +61,8 @@ item	*itemList::getFirstItem()
 
 
 //-----------------------------------------------
-void	*itemList::getItemPointer(item *req_item)
+void	*itemList::getContent(item *req_item)
 //-----------------------------------------------
 {
-	return	(req_item->pointer);
+	return	(req_item->content);
 }
