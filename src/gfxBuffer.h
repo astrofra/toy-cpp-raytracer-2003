@@ -1,9 +1,5 @@
-// C++ (ugly) code by http://fra.dozign.com
-// In no event shall the author be liable for any indirect or
-// consequential damages or loss of data resulting from use
-// or performance of this software.
-
-#include "tools.h"
+// #include "tools.h"
+#include "math.h"
 
 #ifndef	GFXBUFFER
 #define	GFXBUFFER
@@ -15,35 +11,32 @@
 
 #define	GFXBUFFER_MAX_BLUR_RADIUS	64
 
-//-------- colors ------------------------
-
-class Ccolor_4c
+struct targa_header
 {
-public:
-	unsigned char	redValue;
-	unsigned char	greenValue;
-	unsigned char	blueValue;
-	unsigned char	alphaValue;
+    unsigned char  identsize;			// size of ID field that follows 18 byte header (0 usually)
+    unsigned char  colourmaptype;		// type of colour map 0=none, 1=has palette
+    unsigned char  imagetype;			// type of image 0=none,1=indexed,2=rgb,3=grey,+8=rle packed
+
+	unsigned char  pad[5];
+
+    unsigned short xstart;				// image x origin
+    unsigned short ystart;				// image y origin
+    unsigned short width;				// image width in pixels
+    unsigned short height;				// image height in pixels
+    unsigned char  bits;				// image bits per pixel 8,16,24,32
+    unsigned char  descriptor;			// image descriptor bits (vh flip bits)
+
 };
 
-class Ccolor_4f
+//-------- colors ------------------------
+
+struct rgba
 {
 public:
-	Ccolor_4f();
-	Ccolor_4f(float );
-	Ccolor_4f(float ,float ,float);
-	Ccolor_4f(float ,float ,float, float);
-
-	~Ccolor_4f();
-
-	Ccolor_4f		operator+= (Ccolor_4f&);
-	Ccolor_4f		operator-= (Ccolor_4f&);
-	Ccolor_4f		operator*= (Ccolor_4f&);
-
-	float	redValue;
-	float	greenValue;
-	float	blueValue;
-	float	alphaValue;
+	unsigned char	r;
+	unsigned char	g;
+	unsigned char	b;
+	unsigned char	a;
 };
 
 //-------- gfxBuffer ------------------------
@@ -62,13 +55,13 @@ class	gfxBuffer
 
 		gfxBuffer		*duplicateBuffer();
 
-		void			putPixel(int, int, Ccolor_4f&);
-		Ccolor_4f		getPixel(int, int);
+		void			putPixel(int, int, Rcolor&);
+		Rcolor			getPixel(int, int);
 
 		gfxBuffer		operator+= (gfxBuffer&);
-		gfxBuffer		operator+= (Ccolor_4f&);
+		gfxBuffer		operator+= (Rcolor&);
 		gfxBuffer		operator*= (gfxBuffer&);
-		gfxBuffer		operator*= (Ccolor_4f&);
+		gfxBuffer		operator*= (Rcolor&);
 
 		// buffer filtering
 		void			filterBoxBlur(int); // blur_radius
@@ -81,10 +74,10 @@ class	gfxBuffer
 		int				loadFileTarga(char *);
 
 	private:
-		Ccolor_4f		*buffer;
+		Rcolor			*buffer;
 		int				size_x, size_y;
 
-		Ccolor_4f		*getPixelPointer(int , int );
+		Rcolor			*getPixelPointer(int , int );
 
 };
 

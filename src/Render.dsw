@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "trace"=.\trace.dsp - Package Owner=<4>
+Project: "Render"=.\Render.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

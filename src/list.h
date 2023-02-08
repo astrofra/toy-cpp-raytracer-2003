@@ -1,11 +1,6 @@
-// itemList.h
+// Rlist.h
 
-// C++ (ugly) code by http://fra.dozign.com
-// In no event shall the author be liable for any indirect or
-// consequential damages or loss of data resulting from use
-// or performance of this software.
-
-#include "gfxBuffer.h"
+//#include "gfxBuffer.h"
 
 #ifndef	ITEM_LIST
 #define ITEM_LIST
@@ -14,30 +9,34 @@
 
 class item
 {
+private :
 	void	*content;
 	item	*next;
 	
-	friend class itemList;
+	friend class Rlist;
 };
 
-//-------- itemList ------------------------
+//-------- Rlist ------------------------
 
-class	itemList
+class	Rlist
 {
 public:
-	itemList();
-	~itemList();
+	Rlist();
+	~Rlist();
 	void	insertItem(void *);
+	void	appendItem(void *);
 	item	*gotoListHead();
 	item	*gotoNextItem();
 	item	*gotoPrevItem();
 	item	*gotoFirstItem();
 	void	*getContent();
 	void	removeItem();
+	int		itemCount();
 
 private:
 	item	*head;
 	item	*current;
+	int		count;		// the counter is not necessary to the linked list's mechanic : only req'd for table creation purpose
 
 };
 

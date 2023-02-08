@@ -1,57 +1,71 @@
 // math.h
 
-// C++ (ugly) code by http://fra.dozign.com
-// In no event shall the author be liable for any indirect or
-// consequential damages or loss of data resulting from use
-// or performance of this software.
+#include <stdlib.h>
 
 #ifndef	MATH_TOOLS
 #define	MATH_TOOLS
 
-//-------- Cpoint ------------------------
+//-------- Misc tools ------------------------
 
-class Cpoint
+#define	MIN_VALUE(V, MIN_VAL) (V < MIN_VAL ? MIN_VAL : V)
+#define	MAX_VALUE(V, MAX_VAL) (V > MAX_VAL ? MAX_VAL : V)
+#define	BOUND_VALUE(V, MIN_VAL, MAX_VAL) (MAX_VALUE(MIN_VALUE(V, MIN_VAL), MAX_VAL))
+
+#define RAND(A)	(rand()%1000 / 1000.0f) * (A)
+
+unsigned char	floatToUnsignedChar(float);
+
+float			unsignedCharToFloat(unsigned char);
+
+//-------- Rpoint ------------------------
+
+class Rpoint
 {
 public:
-	Cpoint();
-	Cpoint(double);
-	Cpoint(double, double, double);
-	~Cpoint();
+	Rpoint();
+	Rpoint(double);
+	Rpoint(double, double, double);
+	~Rpoint();
 
-	const double	getX();
-	const double	getY();
-	const double	getZ();
+	void	normalize();
+	double	length();
 
-	Cpoint	operator+(Cpoint);
-	Cpoint	operator+(double);
+	Rpoint	operator+(Rpoint);
+	Rpoint	operator+(double);
 
-	Cpoint	operator-(Cpoint);
-	Cpoint	operator-(double);
+	Rpoint	operator-(Rpoint);
+	Rpoint	operator-(double);
 
-	Cpoint	operator*(Cpoint);
-	Cpoint	operator*(double); 
+	Rpoint	operator*(double);
 
-private :
+	Rpoint	operator%(Rpoint); // cross product
+
+	double	operator*(Rpoint); // dot product
+
 	double	x, y, z;
 };
-/*
 
-//-------- Ccolor ------------------------
+//-------- Rcolor ------------------------
 
-class Ccolor : public Cpoint
+class Rcolor
 {
 public:
-	Ccolor();
-	Ccolor(double);
-	Ccolor(double, double, double);
-	~Ccolor();
+	Rcolor();
+	Rcolor(double);
+	Rcolor(double, double, double);
+	~Rcolor();
 
-	const double	getR();
-	const double	getG();
-	const double	getB();
-}
+	Rcolor	operator+(Rcolor);
+	Rcolor	operator+(double);
 
-*/
+	Rcolor	operator-(Rcolor);
+	Rcolor	operator-(double);
+
+	Rcolor	operator*(Rcolor);
+	Rcolor	operator*(double);
+
+	double	r, g, b;
+};
 
 #endif
 

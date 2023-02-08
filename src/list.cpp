@@ -1,48 +1,74 @@
-// itemList.cpp
-
-// C++ (ugly) code by http://fra.dozign.com
-// In no event shall the author be liable for any indirect or
-// consequential damages or loss of data resulting from use
-// or performance of this software.
-
+// list.cpp
 #include <memory.h>
 #include <stdio.h>
 
-#include "itemList.h"
-#include "gfxBuffer.h"
+#include "list.h"
 
-//-------- itemList ------------------------
+//-------- Rlist ------------------------
 
 //------------------
-itemList::itemList()
+Rlist::Rlist()
 //------------------
 {
 	current = head = new item;
 	head->next = 0;
+	count	= 0;
 }
 
 //-------------------
-itemList::~itemList()
+Rlist::~Rlist()
 //-------------------
 {
 // hem
 }
 
+//------------------------
+int		Rlist::itemCount()
+//------------------------
+{
+	return (count);
+}
 
 //--------------------------------
-void	itemList::insertItem(void *new_content)
+void	Rlist::insertItem(void *new_content)
 //--------------------------------
 {
 	item	*new_item;
+
 	new_item = new item;
-	
 	new_item->content = new_content;	
 	new_item->next = current->next;
 	current->next = new_item;
+
+	count++;
+}
+
+//--------------------------------
+void	Rlist::appendItem(void *new_content)
+//--------------------------------
+{
+	item	*new_item,
+			*temp;
+	
+	if (current->next != 0) // if we're not at the end of the list
+	{
+		temp = current; // if we're not yet : go there
+		while (current->next != 0)
+			temp = current->next;
+
+	}
+
+	new_item = new item;
+	new_item->content = new_content;
+	current->next = new_item;
+	new_item->next = 0;
+	current = new_item;
+
+	count++;
 }
 
 //----------------------------------
-void	itemList::removeItem()
+void	Rlist::removeItem()
 //----------------------------------
 // Remove item next to current
 {
@@ -55,26 +81,28 @@ void	itemList::removeItem()
 		temp->next = 0;
 		delete	temp->content; // ??
 		delete	temp;
+
+		count--;
 	}
 
 }
 
 //------------------------------------
-item	*itemList::gotoNextItem()
+item	*Rlist::gotoNextItem()
 //------------------------------------
 {
-	//printf("itemList::gotoNextItem() : %i\n", current);
+	//printf("Rlist::gotoNextItem() : %i\n", current);
 	return (current = current->next);
 }
 
 //-------------------------------
-item	*itemList::gotoPrevItem()
+item	*Rlist::gotoPrevItem()
 //-------------------------------
 {
 	item *temp;
 	temp = head;
 
-	//printf("itemList::gotoPrevItem() : %i\n", current);
+	//printf("Rlist::gotoPrevItem() : %i\n", current);
 	if (current != head->next)
 	{
 		while((temp != 0) && (temp->next != current))
@@ -92,7 +120,7 @@ item	*itemList::gotoPrevItem()
 }
 
 //-------------------------------
-item	*itemList::gotoFirstItem()
+item	*Rlist::gotoFirstItem()
 //-------------------------------
 {
 	return	(current = head->next);
@@ -100,7 +128,7 @@ item	*itemList::gotoFirstItem()
 
 
 //-------------------------------
-item	*itemList::gotoListHead()
+item	*Rlist::gotoListHead()
 //-------------------------------
 {
 	return	(current = head);
@@ -108,7 +136,7 @@ item	*itemList::gotoListHead()
 
 
 //-----------------------------------------------
-void	*itemList::getContent()
+void	*Rlist::getContent()
 //-----------------------------------------------
 {
 	return	(current->content);
