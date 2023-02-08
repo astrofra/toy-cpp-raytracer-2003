@@ -8,6 +8,8 @@
 #ifndef RENDERER
 #define RENDERER
 
+#define	BACKGROUND_COLOR	0.5
+
 //-------- RrenderContext ------------------------
 
 class	RrenderContext
@@ -42,10 +44,12 @@ public:
 	void		computeBoundingBoxes();
 	void		fitScene(float );
 
+	void		printBoundingBoxes();
+
 	// render
 	void		renderScene();
 	void		saveRender();
-	Rcolor		Trace(RrenderContext);
+	Rcolor		Trace(RrenderContext&);
 
 	// render datas (size, frame buffer)
 	gfxBuffer	*frame_buffer;

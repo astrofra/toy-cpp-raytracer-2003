@@ -42,37 +42,67 @@ void Rpoint::normalize()
 }
 
 float Rpoint::length()
-{	return (sqrt(x * x + y * y + z * z)); }
+{	return ((float)sqrt(x * x + y * y + z * z)); }
 
-Rpoint	Rpoint::operator+(Rpoint a)
+Rpoint	Rpoint::operator+(Rpoint &a)
 {	return Rpoint(x + a.x, y + a.y, z + a.z); }
 
-Rpoint	Rpoint::operator+(float b)
+Rpoint	Rpoint::operator+(float &b)
 {	return Rpoint(x + b, y + b, z + b); }
 
-Rpoint	Rpoint::operator-(Rpoint a)
-{	return Rpoint(x - a.x, y - a.y, z - a.z); }
-
-Rpoint	Rpoint::operator-(float b)
-{	return Rpoint(x - b, y - b, z - b); }
-
-float	Rpoint::operator*(Rpoint a)	// dot product
-{	return (x * a.x + y * a.y + z * a.z); }
-
-Rpoint	Rpoint::operator*(float b)
-{
-	/*
-	static Rpoint p;
-	p.x = this->x * b;
-	p.y = this->y * b;
-	p.z = this->z * b;
-	
-	return p;*/
-
-	return Rpoint(x * b, y * b, z * b);
+Rpoint	&Rpoint::operator+=(Rpoint &a)
+{	
+	x += a.x;	
+	y += a.y;
+	z += a.z;
+	return *this;
 }
 
-Rpoint	Rpoint::operator%(Rpoint a) // cross product
+Rpoint	&Rpoint::operator+=(float &b)
+{	
+	x += b;	
+	y += b;
+	z += b;
+	return *this;
+}
+
+Rpoint	Rpoint::operator-(Rpoint &a)
+{	return Rpoint(x - a.x, y - a.y, z - a.z); }
+
+Rpoint	Rpoint::operator-(float &b)
+{	return Rpoint(x - b, y - b, z - b); }
+
+Rpoint	&Rpoint::operator-=(Rpoint &a)
+{	
+	x -= a.x;	
+	y -= a.y;
+	z -= a.z;
+	return *this;
+}
+
+Rpoint	&Rpoint::operator-=(float &b)
+{	
+	x -= b;	
+	y -= b;
+	z -= b;
+	return *this;
+}
+
+Rpoint	Rpoint::operator*(float &b)	// scale
+{	return Rpoint(x * b, y * b, z * b); }
+
+Rpoint	&Rpoint::operator*=(float &b)
+{	
+	x *= b;	
+	y *= b;
+	z *= b;
+	return *this;
+}
+
+float	Rpoint::operator*(Rpoint &a)	// dot product
+{	return (x * a.x + y * a.y + z * a.z); }
+
+Rpoint	Rpoint::operator%(Rpoint &a) // cross product
 {
 	Rpoint b;
 	b.x = y * a.z - a.y * z;

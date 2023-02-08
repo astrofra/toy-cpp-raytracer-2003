@@ -60,8 +60,8 @@ Rmesh::~Rmesh()
 void	Rmesh::computeBoundingBox()
 //---------------------------------
 {
-	bounding_box_min = Rpoint(0.0f);
-	bounding_box_max = Rpoint(0.0f);
+	bounding_box_min = Rpoint(INTERSECTION_INFINITE);
+	bounding_box_max = Rpoint(-INTERSECTION_INFINITE);
 
 	// for every point
 	for(int i = 0; i < this->point_count; i++)
@@ -78,6 +78,15 @@ void	Rmesh::computeBoundingBox()
 
 }
 
+//---------------------------------
+void	Rmesh::printBoundingBox()
+//---------------------------------
+{
+	printf("Rmesh::printBoundingBox()\n   min(%f, %f, %f) / max(%f, %f, %f)\n", 
+		bounding_box_min.x, bounding_box_min.y, bounding_box_min.z,
+		bounding_box_max.x, bounding_box_max.y, bounding_box_max.z);
+}
+
 //-----------------------------
 void	Rmesh::computeNormals()
 //-----------------------------
@@ -87,88 +96,130 @@ void	Rmesh::computeNormals()
 		this->polygon_table[i].computeNormal(); //current_poly.computeNormal();
 }
 
-//--------------------------------------------------------
-int		Rmesh::RayIntersectBoundingBox(Rpoint P, Rpoint I)
-//--------------------------------------------------------
+//------------------------------------------------------------------------
+int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
+//------------------------------------------------------------------------
 {
-	//For each pair of planes P associated with X, Y, and Z do:
-	{
-		//(example using X planes)
+    // calculate x planes interval
+    float tmin;
+    float tmax;
 
-		// if direction Xd = 0 then the ray is parallel to the X planes, so
-		{
-			//if origin Xo is not between the slabs ( Xo < Xl or Xo > Xh) 
-			{
-				//return false
-			}
-			//else, 
-			{
-				//if the ray is not parallel to the plane then
-				{
-					//while()
-					{
-						// compute the intersection distance of the planes
-						//T1 = (Xl - Xo) / Xd
-						//T2 = (Xh - Xo) / Xd
-						//If T1 > T2 swap (T1, T2) /* since T1 intersection with near plane */
-						//If T1 > Tnear set Tnear =T1 /* want largest Tnear */
-						//If T2 < Tfar set Tfar="T2" /* want smallest Tfar */
-						//If Tnear > Tfar box is missed so return false
-						//If Tfar < 0 box is behind ray return false end
-					}
+    if (I.x>0) {
 
-				}
-			}
-		}
-	}
+        tmax = (-P.x+bounding_box_max.x) / I.x;
+        if (tmax<INTERSECTION_EPSILON) return 0;            
+        tmin = (-P.x+bounding_box_min.x) / I.x;
+        if (tmin<INTERSECTION_EPSILON) tmin = INTERSECTION_EPSILON;
+            
+    } else if (I.x!=0) {
 
-	// If Box survived all above tests, 
-	// return true with intersection point Tnear and exit point Tfar.
+        tmax = (-P.x+bounding_box_min.x) / I.x;
+        if (tmax<INTERSECTION_EPSILON) return 0;
+        tmin = (-P.x+bounding_box_max.x) / I.x;
+        if (tmin<INTERSECTION_EPSILON) tmin = INTERSECTION_EPSILON;
 
+    } else {
+
+        if (P.x<bounding_box_min.x || P.x>bounding_box_max.x ) return 0;
+        tmin = INTERSECTION_EPSILON;
+        tmax = INTERSECTION_INFINITE;
+        
+    }
+        
+    // calculate y planes interval
+    if (I.y>0) {
+
+        float t = (-P.y+bounding_box_max.y) / I.y; //y max
+        if (t<tmin) return 0;  if (t<tmax) tmax = t;
+        t = (-P.y+bounding_box_min.y) / I.y; //y min
+        if (t>tmax) return 0;  if (t>tmin) tmin = t;
+            
+    } else if (I.y!=0) {
+
+        float t = (-P.y+bounding_box_min.y) / I.y; //y max
+        if (t<tmin) return 0;  if (t<tmax) tmax = t;
+        t = (-P.y+bounding_box_max.y) / I.y; //y min
+        if (t>tmax) return 0;  if (t>tmin) tmin = t;
+            
+    } else {
+        
+        if (P.y<bounding_box_min.y || P.y>bounding_box_max.y ) return 0;
+        
+    }
+        
+	/*
+    // calculate z planes interval
+    if (I.z>0) {
+
+        float t = (-P.z+bounding_box_max.z) / I.z;  // z max
+        if (t<tmin) return 0;  if (t<tmax) tmax = t;
+        t = (-P.z+bounding_box_min.z) / I.z;  // z min
+        if (t>tmax) return 0;  if (t>tmin) tmin = t;
+            
+    } else if(I.z!=0) {
+
+        float t = (-P.z+bounding_box_min.z) / I.z; // z max            
+        if (t<tmin) return 0;  if (t<tmax) tmax = t;
+        t = (-P.z+bounding_box_max.z) / I.z; // z min
+        if (t>tmax) return 0;  if (t>tmin) tmin = t;
+            
+    } else {
+        
+        if (P.z>bounding_box_min.z || P.z<bounding_box_max.z ) return 0;
+        
+    }
+	*/
+
+    z_hit = tmin;
 	return 1;
 }
 
+
 //---------------------------------------------------------------------------------------
-int		Rmesh::RayIntersectPoly(Rpoint P, Rpoint I, int index_polygon)
+int		Rmesh::RayIntersectPoly(Rpoint& P, Rpoint& I, int& index_polygon, float& z_hit)
 //---------------------------------------------------------------------------------------
 {
-   static Rpoint edge1, edge2, tvec, pvec, qvec;
-   static float det,inv_det;
-   static float t, u, v;
-   static Rpoint	a,b,c;
+	static Rpoint edge1, edge2, tvec, pvec, qvec;
+	static float det,inv_det;
+	static float t, u, v;
+	static Rpoint	a,b,c;
 
-   a = point_table[polygon_table[index_polygon].points[0]];
-   b = point_table[polygon_table[index_polygon].points[1]];
-   c = point_table[polygon_table[index_polygon].points[2]];
+	a = point_table[polygon_table[index_polygon].points[0]];
+	b = point_table[polygon_table[index_polygon].points[1]];
+	c = point_table[polygon_table[index_polygon].points[2]];
 
-   edge1 = b - a;
-   edge2 = c - a;
+	edge1 = b; edge1 -= a;
+	edge2 = c; edge2 -= a;
     
-   pvec = I % edge2;
-   det = edge1 * pvec;
+	pvec = I % edge2;
 
-   if (det > -0.000001f && det < 0.000001f)
-     return 0;
-   inv_det = 1.0 / det;
+	det = edge1 * pvec;
 
-   // calculate distance from vert0 to ray origin 
-   tvec = P - a;
+	if (det > -INTERSECTION_EPSILON && det < INTERSECTION_EPSILON)
+		return 0;
+	
+	inv_det = 1.0f / det;
 
-   // calculate U parameter and test bounds 
-   u = (tvec * pvec ) * inv_det;
-   if (u < 0.0 || u > 1.0)
-     return 0;
+	// calculate distance from vert0 to ray origin 
+	tvec = P; tvec -= a;
 
-   // prepare to test V parameter 
-   qvec = tvec % edge1;
+	// calculate U parameter and test bounds 
+	u = (tvec * pvec) * inv_det;
 
-   // calculate V parameter and test bounds 
-   v = (I * qvec) * inv_det;
-   if (v < 0.0 || u + v > 1.0)
-     return 0;
+	if (u < 0.0 || u > 1.0f)
+		return 0;
 
-   // calculate t, ray intersects triangle 
-   t = (edge2 * qvec) * inv_det;
+	// prepare to test V parameter 
+	qvec = tvec % edge1;
+
+	// calculate V parameter and test bounds 
+	v = (I * qvec) * inv_det;
+
+	if (v < 0.0 || u + v > 1.0)
+		return 0;
+
+	// calculate t, ray intersects triangle 
+	z_hit = (edge2 * qvec) * inv_det;
 
    return 1;
 }
@@ -181,7 +232,7 @@ void	Rmesh::scale(float scale_factor)
 	// for every point
 	if (scale_factor != 1.0){
 		for(int i = 0; i < this->point_count; i++){
-			point_table[i] = point_table[i] * scale_factor;	
+			point_table[i] *= scale_factor;	
 		}
 	}
 

@@ -180,6 +180,23 @@ void Rrenderer::computeBoundingBoxes()
 	
 }
 
+//------------------------------------
+void Rrenderer::printBoundingBoxes()
+//------------------------------------
+{
+	Rmesh	*mesh;
+	(*meshes_list).gotoListHead();
+
+	int i = 0;
+
+	while((*meshes_list).gotoNextItem())
+	{
+		i++;
+		mesh = (Rmesh *)(*meshes_list).getContent();
+		(*mesh).printBoundingBox();
+	}	
+}
+
 //----------------------------------------------------
 void Rrenderer::fitScene(float max_bounding_distance)
 //----------------------------------------------------
@@ -262,11 +279,13 @@ void	Rrenderer::renderScene()
 			(*frame_buffer).putPixel(x, y, Trace(projection_screen));
 			
 		}
+
 		printf("\b\b\b\b\b\b\b\b\b\b\b");
 	}
 	printf("\n");
 
 	printf("Rrenderer::renderScene(), %i ray/polygon hit, %i ray/poly missed\n",ray_poly_hit,ray_poly_missed);
+	printf("Rrenderer::renderScene(), ray casting accuracy : %f %% \n", ((float)ray_poly_hit * 100.0f) / (float)ray_poly_missed);
 }
 
 //-----------------------------
@@ -278,33 +297,41 @@ void	Rrenderer::saveRender()
 
 
 //----------------------------------------------
-Rcolor	Rrenderer::Trace(RrenderContext context)
+Rcolor	Rrenderer::Trace(RrenderContext& context)
 //----------------------------------------------
 {
-	Rmesh		*current_mesh = 0;
+	Rmesh		*current_mesh = 0,
+				*object_hit = 0;
+
 	Rpolygon	*current_polygon = 0;
-	int	i;
+	
+	int			i;
+	float		z_hit, z_BB_hit, 
+				z_hit_min = INTERSECTION_INFINITE; // INTERSECTION_EPSILON
+
 	//Rcolor		trace_result;
 
-	// for every object
 	(*meshes_list).gotoListHead();
 	while((*meshes_list).gotoNextItem())
 	{
 		current_mesh = (Rmesh *)(*meshes_list).getContent();
+
 		// if ray hits object's bouding box
-		if ((*current_mesh).RayIntersectBoundingBox(context.P, context.I))
+		if ((*current_mesh).RayIntersectBoundingBox(context.P, context.I, z_BB_hit))
 		{
 			// for every polygons
 			for(i = 0; i < (*current_mesh).polygon_count; i++)
 			{
 				// if ray hits polygon
-				if ((*current_mesh).RayIntersectPoly(context.P, context.I, i))
+				if ((*current_mesh).RayIntersectPoly(context.P, context.I, i, z_hit))
 				{
 					ray_poly_hit++;
+
 					// if intersection is clother to camera than previous one
+					if (z_hit < z_hit_min)
 					{
-						return Rcolor(1.0);
-						// call shader
+						z_hit_min = z_hit;
+						object_hit = current_mesh;
 					}
 
 				}
@@ -316,7 +343,16 @@ Rcolor	Rrenderer::Trace(RrenderContext context)
 			}
 		}
 	}
-	return Rcolor(0.0);
+
+	if (object_hit != 0)
+	{
+		// call shader
+		return Rcolor(1.0);
+	}
+	else
+	{
+		return Rcolor(BACKGROUND_COLOR);
+	}
 }
 
 

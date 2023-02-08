@@ -13,6 +13,9 @@
 
 #define RAND(A)	(rand()%1000 / 1000.0f) * (A)
 
+#define	INTERSECTION_EPSILON	0.000001f
+#define INTERSECTION_INFINITE	(1.0f / INTERSECTION_EPSILON)
+
 unsigned char	floatToUnsignedChar(float);
 
 float			unsignedCharToFloat(unsigned char);
@@ -30,17 +33,22 @@ public:
 	void	normalize();
 	float	length();
 
-	Rpoint	operator+(Rpoint); // translation
-	Rpoint	operator+(float); //      "
+	Rpoint	operator+(Rpoint&); // translation
+	Rpoint	operator+(float&); 
+	Rpoint&	operator+=(Rpoint&);
+	Rpoint&	operator+=(float&);
 
-	Rpoint	operator-(Rpoint); //      "
-	Rpoint	operator-(float); //      "
+	Rpoint	operator-(Rpoint&);
+	Rpoint	operator-(float&); 
+	Rpoint&	operator-=(Rpoint&);
+	Rpoint&	operator-=(float&);
 
-	Rpoint	operator*(float); // scale
+	Rpoint	operator*(float&); // scale
+	Rpoint&	operator*=(float&); // scale
 
-	Rpoint	operator%(Rpoint); // cross product
+	Rpoint	operator%(Rpoint&); // cross product
 
-	float	operator*(Rpoint); // dot product
+	float	operator*(Rpoint&); // dot product
 
 	float	x, y, z;
 };

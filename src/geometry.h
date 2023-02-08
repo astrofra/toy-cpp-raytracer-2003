@@ -38,8 +38,10 @@ public:
 	void	computeBoundingBox();
 	void	scale(float );
 
-	int		RayIntersectPoly(Rpoint , Rpoint , int);
-	int		RayIntersectBoundingBox(Rpoint , Rpoint);
+	void	printBoundingBox();
+
+	int		RayIntersectPoly(Rpoint& , Rpoint& , int&, float&);
+	int		RayIntersectBoundingBox(Rpoint& , Rpoint&, float&);
 
 	// datas
 	int			point_count;
