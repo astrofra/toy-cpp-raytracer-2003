@@ -141,3 +141,10 @@ void	*Rlist::getContent()
 {
 	return	(current->content);
 }
+
+//-----------------------------------------------
+void	**Rlist::getContentPointer()
+//-----------------------------------------------
+{
+	return	(&(current->content));
+}

@@ -30,6 +30,7 @@ public:
 	item	*gotoPrevItem();
 	item	*gotoFirstItem();
 	void	*getContent();
+	void	**getContentPointer();
 	void	removeItem();
 	int		itemCount();
 

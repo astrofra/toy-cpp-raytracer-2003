@@ -67,7 +67,7 @@ int	gfxBuffer::isEmpty()
 
 
 //-----------------------------------------------------------
-void	gfxBuffer::putPixel(int x, int y, Rcolor &pixel)
+void	gfxBuffer::putPixel(int x, int y, Rcolor pixel)
 //-----------------------------------------------------------
 {
 	Rcolor *tmp;
@@ -185,7 +185,13 @@ int gfxBuffer::saveFileTarga(char *fname)
 	int	x,y;
 
 	// prepare 32bits int. buffer
-	ldr_buffer = new rgba[size_x * size_y];
+	ldr_buffer = new rgba[getBufferSizeX() * getBufferSizeY()];
+
+	if (ldr_buffer == 0)
+	{
+		printf("gfxBuffer::saveFileTarga : Cannot allocate RGBA buffer\n");
+		return (GFXBUFFER_ERROR);
+	}
 
 	//copy hdr buffer to ldr buffer
 	for(y = 0; y < size_y; y++)
@@ -206,7 +212,7 @@ int gfxBuffer::saveFileTarga(char *fname)
 	if( !fp )
 	{
 	   printf("gfxBuffer::saveFileTarga : file open error on %s.\n", fname );
-	   return GFXBUFFER_ERROR;
+	   return (GFXBUFFER_ERROR);
 	}
 
 	// Create file header
@@ -232,10 +238,11 @@ int gfxBuffer::saveFileTarga(char *fname)
 	fwrite(ldr_buffer, size_x * size_y * GFXBUFFER_DEPTH_RGB32, 1, fp );
 
 	// Clear stuff
-	fclose( fp );
+	//fclose( fp );
 
 	delete header;
 	delete []ldr_buffer;
+	//free(ldr_buffer);
 
 	return GFXBUFFER_NO_ERROR;
 }

@@ -17,7 +17,8 @@ public:
 
 private:
 	unsigned int	points[3];
-	Rpoint			N;		//	surface geometric normal 
+	Rpoint			N;		//	surface geometric normal
+	Rcolor			Cs;		//  surface color
 
 	friend class Rmesh;
 };
@@ -31,10 +32,16 @@ public:
 	~Rmesh();
 
 	int		loadFileWavefront(char *);
+	int		saveFileWavefront(char *);
+
 	void	computeNormals();
 	void	computeBoundingBox();
+	void	scale(float );
 
-private:
+	int		RayIntersectPoly(Rpoint , Rpoint , int);
+	int		RayIntersectBoundingBox(Rpoint , Rpoint);
+
+	// datas
 	int			point_count;
 	int			polygon_count;
 		

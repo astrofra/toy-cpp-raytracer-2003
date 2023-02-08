@@ -27,40 +27,50 @@ float	unsignedCharToFloat(unsigned char value_in)
 Rpoint::Rpoint()
 {	x = y = z = 0.0;}
 
-Rpoint::Rpoint(double a)
+Rpoint::Rpoint(float a)
 {	x = y = z = a;}
 
-Rpoint::Rpoint(double a, double b, double c)
+Rpoint::Rpoint(float a, float b, float c)
 {	x = a; y = b; z = c;}
 
 Rpoint::~Rpoint() { };
 
 void Rpoint::normalize()
 {
-	double l = 1.0 / this->length();
+	float l = 1.0f / this->length();
 	x *= l; y *= l; z *= l;
 }
 
-double Rpoint::length()
+float Rpoint::length()
 {	return (sqrt(x * x + y * y + z * z)); }
 
 Rpoint	Rpoint::operator+(Rpoint a)
 {	return Rpoint(x + a.x, y + a.y, z + a.z); }
 
-Rpoint	Rpoint::operator+(double b)
+Rpoint	Rpoint::operator+(float b)
 {	return Rpoint(x + b, y + b, z + b); }
 
 Rpoint	Rpoint::operator-(Rpoint a)
 {	return Rpoint(x - a.x, y - a.y, z - a.z); }
 
-Rpoint	Rpoint::operator-(double b)
+Rpoint	Rpoint::operator-(float b)
 {	return Rpoint(x - b, y - b, z - b); }
 
-double	Rpoint::operator*(Rpoint a)	// dot product
+float	Rpoint::operator*(Rpoint a)	// dot product
 {	return (x * a.x + y * a.y + z * a.z); }
 
-Rpoint	Rpoint::operator*(double b)
-{	return Rpoint(x * b, y * b, z * b); }
+Rpoint	Rpoint::operator*(float b)
+{
+	/*
+	static Rpoint p;
+	p.x = this->x * b;
+	p.y = this->y * b;
+	p.z = this->z * b;
+	
+	return p;*/
+
+	return Rpoint(x * b, y * b, z * b);
+}
 
 Rpoint	Rpoint::operator%(Rpoint a) // cross product
 {
@@ -76,10 +86,10 @@ Rpoint	Rpoint::operator%(Rpoint a) // cross product
 Rcolor::Rcolor()
 {	r = g = b = 0.0;}
 
-Rcolor::Rcolor(double a)
+Rcolor::Rcolor(float a)
 {	r = g = b = a;}
 
-Rcolor::Rcolor(double i, double j, double k)
+Rcolor::Rcolor(float i, float j, float k)
 {	r = i; g = j; b = k;}
 
 Rcolor::~Rcolor() { };
@@ -87,18 +97,18 @@ Rcolor::~Rcolor() { };
 Rcolor	Rcolor::operator+(Rcolor a)
 {	return Rcolor(r + a.r, g + a.g, b + a.b); }
 
-Rcolor	Rcolor::operator+(double a)
+Rcolor	Rcolor::operator+(float a)
 {	return Rcolor(r + a, g + a, b + a); }
 
 Rcolor	Rcolor::operator-(Rcolor a)
 {	return Rcolor(r - a.r, g - a.g, b - a.b); }
 
-Rcolor	Rcolor::operator-(double a)
+Rcolor	Rcolor::operator-(float a)
 {	return Rcolor(r - a, g - a, b - a); }
 
 Rcolor	Rcolor::operator*(Rcolor a)
 {	return Rcolor(r * a.r, g * a.g, b * a.b); }
 
-Rcolor	Rcolor::operator*(double a)
+Rcolor	Rcolor::operator*(float a)
 {	return Rcolor(r * a, g * a, b * a); }
 

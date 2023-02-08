@@ -32,7 +32,6 @@ struct targa_header
 
 struct rgba
 {
-public:
 	unsigned char	r;
 	unsigned char	g;
 	unsigned char	b;
@@ -55,7 +54,7 @@ class	gfxBuffer
 
 		gfxBuffer		*duplicateBuffer();
 
-		void			putPixel(int, int, Rcolor&);
+		void			putPixel(int, int, Rcolor);
 		Rcolor			getPixel(int, int);
 
 		gfxBuffer		operator+= (gfxBuffer&);

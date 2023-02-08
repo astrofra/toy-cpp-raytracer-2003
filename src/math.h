@@ -7,8 +7,8 @@
 
 //-------- Misc tools ------------------------
 
-#define	MIN_VALUE(V, MIN_VAL) (V < MIN_VAL ? MIN_VAL : V)
-#define	MAX_VALUE(V, MAX_VAL) (V > MAX_VAL ? MAX_VAL : V)
+#define	MIN_VALUE(V, MIN_VAL) (V < MIN_VAL ? V : MIN_VAL)
+#define	MAX_VALUE(V, MAX_VAL) (V > MAX_VAL ? V : MAX_VAL)
 #define	BOUND_VALUE(V, MIN_VAL, MAX_VAL) (MAX_VALUE(MIN_VALUE(V, MIN_VAL), MAX_VAL))
 
 #define RAND(A)	(rand()%1000 / 1000.0f) * (A)
@@ -23,26 +23,26 @@ class Rpoint
 {
 public:
 	Rpoint();
-	Rpoint(double);
-	Rpoint(double, double, double);
+	Rpoint(float);
+	Rpoint(float, float, float);
 	~Rpoint();
 
 	void	normalize();
-	double	length();
+	float	length();
 
-	Rpoint	operator+(Rpoint);
-	Rpoint	operator+(double);
+	Rpoint	operator+(Rpoint); // translation
+	Rpoint	operator+(float); //      "
 
-	Rpoint	operator-(Rpoint);
-	Rpoint	operator-(double);
+	Rpoint	operator-(Rpoint); //      "
+	Rpoint	operator-(float); //      "
 
-	Rpoint	operator*(double);
+	Rpoint	operator*(float); // scale
 
 	Rpoint	operator%(Rpoint); // cross product
 
-	double	operator*(Rpoint); // dot product
+	float	operator*(Rpoint); // dot product
 
-	double	x, y, z;
+	float	x, y, z;
 };
 
 //-------- Rcolor ------------------------
@@ -51,20 +51,20 @@ class Rcolor
 {
 public:
 	Rcolor();
-	Rcolor(double);
-	Rcolor(double, double, double);
+	Rcolor(float);
+	Rcolor(float, float, float);
 	~Rcolor();
 
 	Rcolor	operator+(Rcolor);
-	Rcolor	operator+(double);
+	Rcolor	operator+(float);
 
 	Rcolor	operator-(Rcolor);
-	Rcolor	operator-(double);
+	Rcolor	operator-(float);
 
 	Rcolor	operator*(Rcolor);
-	Rcolor	operator*(double);
+	Rcolor	operator*(float);
 
-	double	r, g, b;
+	float	r, g, b;
 };
 
 #endif
