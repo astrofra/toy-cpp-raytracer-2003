@@ -1,6 +1,13 @@
 // #include "tools.h"
 #include "math.h"
 
+#include <stdlib.h>
+#if defined(_MSC_VER)
+#include "SDL.h"
+#else
+#include "SDL/SDL.h"
+#endif
+
 #ifndef	GFXBUFFER
 #define	GFXBUFFER
 
@@ -72,6 +79,9 @@ class	gfxBuffer
 		// file in/out
 		int				saveFileTarga(char *);
 		int				loadFileTarga(char *);
+
+		// display
+		int				displayBufferToSdl(SDL_Surface *screen);
 
 	private:
 		Rcolor			*buffer;

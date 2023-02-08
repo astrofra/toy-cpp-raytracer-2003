@@ -44,15 +44,18 @@ public:
 	void		computeBoundingBoxes();
 	void		fitScene(float );
 	void		translate(Rpoint &);
+
 	void		addLight(Rpoint position = Rpoint(0.0f, 100.0f, 0.0f), 
 						Rcolor color = Rcolor(1.0f), float intensity = 1.0, 
-						float falloff = -1.0, float radius = 0.0);
+						float falloff = -1.0, float radius = 0.0, int type = 1.0);
+	void		addAmbiantLight(Rcolor color = Rcolor(0.2f), float intensity = 1.0);
 
 	void		printBoundingBoxes();
 
 	// render
-	void		renderScene(const int sampling_rate = 4, const float sampling_threshold = 0.1f);
+	void		renderScene(const int sampling_rate = 4, const float sampling_threshold = 0.1f, SDL_Surface *sdl_buffer = 0);
 	void		saveRender();
+	void		displayRender(SDL_Surface *);
 	int			traceRay(RrenderContext&, RrenderContext&, bool);
 	Rcolor		shadePoint(RrenderContext &);
 

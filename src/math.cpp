@@ -22,21 +22,6 @@ float	unsignedCharToFloat(unsigned char value_in)
 	return ( ((float)value_in) / 255.0f );
 }
 
-/*
-//-------- Quasi Random ------------------
-QuasiRandom::QuasiRandom() { rand_index = 0; }
-
-QuasiRandom::~QuasiRandom(); { }
-
-QuasiRandom::getIntQuasiRandom(const int &range)
-{
-	int temp_rand;
-	temp_rand = reinterpret_cast<int>rand_table[gotoNextRand()];
-	return (temp_rand);
-
-}
-*/
-
 //-------- Rpoint ------------------------
 
 Rpoint::Rpoint()
@@ -141,7 +126,8 @@ Rcolor::~Rcolor() { };
 
 float	Rcolor::luminance()
 {
-	return ((r + g + b) * 0.3333333f); // wrong coefs !!!
+	//return ((r + g + b) * 0.3333333f); // wrong coefs !!!
+	return (r * 0.3f + g * 0.59f + b * 0.1f);
 }
 
 Rcolor	Rcolor::operator+(Rcolor& a)

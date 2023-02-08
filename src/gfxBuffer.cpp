@@ -175,6 +175,49 @@ void	gfxBuffer::filterBoxBlur(int blur_radius)
 }
 
 //------------------------------------
+int	gfxBuffer::displayBufferToSdl(SDL_Surface *screen)
+//------------------------------------
+{
+
+	//rgba	*ldr_buffer, *ldr_pt;
+	Rcolor	*hdr_pt;
+	int		x,y, ofs, yofs;
+	float	r,g,b;
+
+	// Lock surface if needed
+	if (SDL_MUSTLOCK(screen)) 
+		if (SDL_LockSurface(screen) < 0) 
+			return(0);
+
+	//copy hdr buffer to ldr buffer
+	yofs = 0;
+	for (y = 0; y < size_y; y++)
+	{
+		for(x = 0, ofs = yofs; x < size_x; x++, ofs++)
+		{
+			//ldr_pt = &ldr_buffer[x + y * size_x];
+			hdr_pt = getPixelPointer(x,y);
+			r	=	floatToUnsignedChar( hdr_pt->r );
+			g	=	floatToUnsignedChar( hdr_pt->g );
+			b	=	floatToUnsignedChar( hdr_pt->b );
+
+			((unsigned int*)screen->pixels)[ofs] = SDL_MapRGB(screen->format,r,g,b);
+		}
+	    yofs += screen->pitch / 4;
+	}
+ 
+  // Unlock if needed
+  if (SDL_MUSTLOCK(screen)) 
+    SDL_UnlockSurface(screen);
+
+  // Tell SDL to update the whole screen
+  SDL_UpdateRect(screen, 0, 0, size_x, size_y);  
+  
+  return(1);
+}
+
+
+//------------------------------------
 int gfxBuffer::saveFileTarga(char *fname)
 //------------------------------------
 {

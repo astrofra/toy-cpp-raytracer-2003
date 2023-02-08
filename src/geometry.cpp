@@ -143,7 +143,7 @@ int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
         
     }
         
-	/*
+	
     // calculate z planes interval
     if (I.z>0) {
 
@@ -164,7 +164,7 @@ int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
         if (P.z<bounding_box_min.z || P.z>bounding_box_max.z ) return 0;
         
     }
-	*/
+	
 
     z_hit = tmin;
 
@@ -244,6 +244,13 @@ void	Rmesh::translate(Rpoint& T)
 		point_table[i] += T;	
 	}
 
+}
+
+
+//-------------------------------------------------------
+void	Rmesh::rotateX(Rpoint& T, float x_angle)
+//-------------------------------------------------------
+{
 }
 
 

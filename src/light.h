@@ -14,10 +14,12 @@ public:
 	Rlight(Rpoint &);
 	~Rlight();
 
-	Rpoint &getLightDirection(Rpoint &);
-	Rcolor &getColor() { return color; };
-	float &getIntensity() { return intensity; };
+	Rpoint	&getLightDirection(Rpoint &);
+	Rcolor	&getColor() { return color; };
+	float	&getIntensity() { return intensity; };
+	int		&getType() { return type;};
 
+	setType(int);
 	setPosition(Rpoint &);
 	setColor(Rcolor &);
 	setIntensity(float &);
@@ -25,6 +27,7 @@ public:
 	setRadius(float &);
 
 private:
+	int		type;  // 0 = AMBIANT LIGHT , type 1 = POINT LIGHT
 	Rpoint	position;
 	Rcolor	color;
 	float	intensity;

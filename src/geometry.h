@@ -39,6 +39,7 @@ public:
 	void	computeBoundingBox();
 	void	scale(float );
 	void	translate(Rpoint&);
+	void	rotateX(Rpoint&, float);
 	void	preshade();
 
 	void	printBoundingBox();

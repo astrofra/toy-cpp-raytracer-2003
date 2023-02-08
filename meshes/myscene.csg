@@ -1,0 +1,8 @@
+#### Constructive Geometry Description file
+
+#	             Sphere list
+# s X Y Z Radius Red Green Blue 
+
+s 0.0 0.0 0.0 20.0 0.8 0.8 0.8
+s -10.0 0.0 0.0 20.0 0.8 0.0 0.8
+s +10.0 0.0 0.0 20.0 0.0 0.8 0.8

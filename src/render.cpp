@@ -2,6 +2,7 @@
 
 #include <memory.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "math.h"
 #include "light.h"
@@ -271,7 +272,7 @@ void Rrenderer::fitScene(float max_bounding_distance)
 }
 
 //------------------------------------------------------------------------------------------------------
-void	Rrenderer::addLight(Rpoint position, Rcolor color, float intensity, float falloff, float radius)
+void	Rrenderer::addLight(Rpoint position, Rcolor color, float intensity, float falloff, float radius, int type)
 //------------------------------------------------------------------------------------------------------
 {
 	Rlight	*new_light;
@@ -285,12 +286,33 @@ void	Rrenderer::addLight(Rpoint position, Rcolor color, float intensity, float f
 	(*new_light).setIntensity(intensity);
 	(*new_light).setFalloff(falloff);
 	(*new_light).setRadius(radius);
+	(*new_light).setType(type);
 
 	(*lights_list).appendItem(new_light);
 }
 
+//------------------------------------------------------------------------------------
+void	Rrenderer::addAmbiantLight(Rcolor color, float intensity)
+//-------------------------------------------------------------------------------------
+{
+	Rlight	*new_light;
+
+	if (lights_list == 0)
+		lights_list = new Rlist();
+
+	new_light = new Rlight();
+
+	(*new_light).setColor(color);
+	(*new_light).setIntensity(intensity);
+	(*new_light).setType(0);
+
+	(*lights_list).appendItem(new_light);
+}
+
+
+
 //------------------------------
-void	Rrenderer::renderScene(const int sampling_rate, const float sampling_threshold)
+void	Rrenderer::renderScene(const int sampling_rate, const float sampling_threshold, SDL_Surface *sdl_buffer)
 //------------------------------
 {
 
@@ -299,7 +321,7 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 	float	xx, yy, last_pixel_luminance = 0.0f;
 	Rcolor	pixel;
 
-	float	sub_pixel_offset = 0.0025f, sub_pixel_weight = 1.0f / (float)sampling_rate;
+	float	sub_pixel_offset = 0.001f, sub_pixel_weight = 1.0f / (float)sampling_rate;
 
 	RrenderContext	projection_screen,
 					trace_result;
@@ -316,7 +338,7 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 	{
 		printf("line %6i", y);
 
-		yy = ((float)y / (float)pixel_size_y) + frame_top;
+		yy = frame_bottom - ((float)y / (float)pixel_size_y);
 
 		for(x = 0; x < pixel_size_x; x++)
 		{
@@ -324,13 +346,15 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 			
 			memset(&pixel, 0, sizeof(pixel));
 
-			if (sampling_rate >= 0)
+			if (sampling_rate >= 0) // Over sampling -> AA enabled
 			{
 
 				for(i = 0; i <= sampling_rate; i++)
 				{
-					projection_screen.P.x = xx + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
-					projection_screen.P.y = yy + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+					//projection_screen.P.x = xx + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+					//projection_screen.P.y = yy + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+					projection_screen.P.x = xx + sub_pixel_offset * cosf( (((i * 360.0f) / (float)sampling_rate) * 3.14156f) / 360.0f );
+					projection_screen.P.y = yy + sub_pixel_offset * sinf( (((i * 360.0f) / (float)sampling_rate) * 3.14156f) / 360.0f );
 
 					if (traceRay(projection_screen,trace_result, false))
 					{
@@ -354,7 +378,7 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 
 				last_pixel_luminance = pixel.luminance();
 			}
-			else
+			else // Under sampling -> AA disabled
 			{
 					projection_screen.P.x = xx;
 					projection_screen.P.y = yy;
@@ -385,6 +409,7 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 		}
 
 		printf("\b\b\b\b\b\b\b\b\b\b\b");
+		if (y == ((y>>4)<<4)) displayRender(sdl_buffer);
 	}
 	printf("\n");
 
@@ -443,13 +468,13 @@ int	Rrenderer::traceRay(RrenderContext& context, RrenderContext& result, bool is
 
 	if (object_hit != 0)
 	{
+		result.P	= context.I;
+		result.P	*= z_hit;
+
 		if (is_shadow_ray == false)
 		{
 			result.Cs	= (*object_hit).polygon_table[polygon_hit].getCs();
 			result.N	= (*object_hit).polygon_table[polygon_hit].getN();
-
-			result.P	= context.I;
-			result.P	*= z_hit;
 		}
 
 		return 1;
@@ -468,29 +493,59 @@ Rcolor	Rrenderer::shadePoint(RrenderContext &context)
 	float	Cl;
 	Rcolor	Ci = Rcolor(0.0f), Ct;
 	// initialise Color buffer
+	RrenderContext temp_cast, temp_cast_result;
 
 	(*lights_list).gotoListHead();
+
+	// reflection pass
+	//	if (traceRay(context,temp_cast_result,false)) Ci += temp_cast_result.Cs;
+
+	// diffusion pass
 
 	// for each light
 	while((*lights_list).gotoNextItem())
 	{
 		current_light = (Rlight *)(*lights_list).getContent();
 
-		// diffusion pass
-		Cl = context.N * (*current_light).getLightDirection(context.P);
-		
-		if (Cl > 0.0f)
+		Ct = Rcolor(0.0f);
+		// if ambiant light
+		if (current_light->getType() == 0)
 		{
-			Ct = context.Cs;
-			Ct *= (*current_light).getColor();
+			Ct += (*current_light).getColor();
 			Ct *= (*current_light).getIntensity();
-			Ct *= Cl;
-
-			// shadow pass
-
-			// Add to Color Buffer
-			Ci += Ct;
 		}
+		else
+		{
+			Cl = context.N * (*current_light).getLightDirection(context.P);
+
+			/* // shadow pass
+			temp_cast.P = context.P;
+			temp_cast.I = (*current_light).getLightDirection(context.P);
+			shadow_cast.P = context.P.x - shadow_cast.I.x * 0.001f;
+			shadow_cast.P = context.P.y - shadow_cast.I.y * 0.001f;
+			shadow_cast.P = context.P.z - shadow_cast.I.z * 0.001f;
+
+			if (traceRay(temp_cast,temp_cast_result,true))
+			{
+				Ct = 0.0f;
+			}
+			else*/
+			{
+
+				if (Cl > 0.0f)
+				{
+
+					Ct += context.Cs;
+					Ct *= (*current_light).getColor();
+					Ct *= (*current_light).getIntensity();
+					Ct *= Cl;
+
+				}
+			}
+		}
+
+		// Add to Color Buffer
+		Ci += Ct;
 	}
 
 	return Ci;
@@ -501,6 +556,13 @@ void	Rrenderer::saveRender()
 //-----------------------------
 {
 	(*frame_buffer).saveFileTarga("out.tga");
+}
+
+//-----------------------------
+void	Rrenderer::displayRender(SDL_Surface *sdl_buffer)
+//-----------------------------
+{
+	(*frame_buffer).displayBufferToSdl(sdl_buffer);
 }
 
 
