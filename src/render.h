@@ -8,7 +8,7 @@
 #ifndef RENDERER
 #define RENDERER
 
-#define	BACKGROUND_COLOR	0.5
+#define	BACKGROUND_COLOR	Rcolor(0.5f)
 
 //-------- RrenderContext ------------------------
 
@@ -43,13 +43,18 @@ public:
 	void		computeSmoothedNormals();
 	void		computeBoundingBoxes();
 	void		fitScene(float );
+	void		translate(Rpoint &);
+	void		addLight(Rpoint position = Rpoint(0.0f, 100.0f, 0.0f), 
+						Rcolor color = Rcolor(1.0f), float intensity = 1.0, 
+						float falloff = -1.0, float radius = 0.0);
 
 	void		printBoundingBoxes();
 
 	// render
-	void		renderScene();
+	void		renderScene(const int sampling_rate = 4, const float sampling_threshold = 0.1f);
 	void		saveRender();
-	Rcolor		Trace(RrenderContext&);
+	int			traceRay(RrenderContext&, RrenderContext&, bool);
+	Rcolor		shadePoint(RrenderContext &);
 
 	// render datas (size, frame buffer)
 	gfxBuffer	*frame_buffer;
@@ -59,6 +64,8 @@ public:
 
 	// scene datas
 	Rlist		*meshes_list;
+	Rlist		*lights_list;
+
 	int			ray_poly_hit,ray_poly_missed;
 };
 

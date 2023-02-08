@@ -124,21 +124,52 @@ Rcolor::Rcolor(float i, float j, float k)
 
 Rcolor::~Rcolor() { };
 
-Rcolor	Rcolor::operator+(Rcolor a)
+float	Rcolor::luminance()
+{
+	return ((r + g + b) * 0.3333333f); // wrong coefs !!!
+}
+
+Rcolor	Rcolor::operator+(Rcolor& a)
 {	return Rcolor(r + a.r, g + a.g, b + a.b); }
 
-Rcolor	Rcolor::operator+(float a)
+Rcolor	Rcolor::operator+(float& a)
 {	return Rcolor(r + a, g + a, b + a); }
 
-Rcolor	Rcolor::operator-(Rcolor a)
+Rcolor&	Rcolor::operator+=(Rcolor& a)
+{	
+	r += a.r;
+	g += a.g;
+	b += a.b;
+
+	return *this;
+}
+
+Rcolor	Rcolor::operator-(Rcolor& a)
 {	return Rcolor(r - a.r, g - a.g, b - a.b); }
 
-Rcolor	Rcolor::operator-(float a)
+Rcolor	Rcolor::operator-(float& a)
 {	return Rcolor(r - a, g - a, b - a); }
 
-Rcolor	Rcolor::operator*(Rcolor a)
+Rcolor	Rcolor::operator*(Rcolor& a)
 {	return Rcolor(r * a.r, g * a.g, b * a.b); }
 
-Rcolor	Rcolor::operator*(float a)
+Rcolor	Rcolor::operator*(float& a)
 {	return Rcolor(r * a, g * a, b * a); }
 
+Rcolor&	Rcolor::operator*=(Rcolor& a)
+{	
+	r *= a.r;
+	g *= a.g;
+	b *= a.b;
+
+	return *this;
+}
+
+Rcolor&	Rcolor::operator*=(float& a)
+{	
+	r *= a;
+	g *= a;
+	b *= a;
+
+	return *this;
+}

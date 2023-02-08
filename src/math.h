@@ -10,6 +10,7 @@
 #define	MIN_VALUE(V, MIN_VAL) (V < MIN_VAL ? V : MIN_VAL)
 #define	MAX_VALUE(V, MAX_VAL) (V > MAX_VAL ? V : MAX_VAL)
 #define	BOUND_VALUE(V, MIN_VAL, MAX_VAL) (MAX_VALUE(MIN_VALUE(V, MIN_VAL), MAX_VAL))
+#define	ABS_VALUE(A) (A < 0.0f ? (-A) : (A)) 
 
 #define RAND(A)	(rand()%1000 / 1000.0f) * (A)
 
@@ -62,15 +63,19 @@ public:
 	Rcolor(float);
 	Rcolor(float, float, float);
 	~Rcolor();
+	float	luminance();
 
-	Rcolor	operator+(Rcolor);
-	Rcolor	operator+(float);
+	Rcolor	operator+(Rcolor&);
+	Rcolor	operator+(float&);
+	Rcolor&	operator+=(Rcolor&);
 
-	Rcolor	operator-(Rcolor);
-	Rcolor	operator-(float);
+	Rcolor	operator-(Rcolor&);
+	Rcolor	operator-(float&);
 
-	Rcolor	operator*(Rcolor);
-	Rcolor	operator*(float);
+	Rcolor	operator*(Rcolor&);
+	Rcolor	operator*(float&);
+	Rcolor&	operator*=(Rcolor&);
+	Rcolor&	operator*=(float&);
 
 	float	r, g, b;
 };

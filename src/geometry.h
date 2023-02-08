@@ -13,7 +13,8 @@ public:
 	Rpolygon();
 	~Rpolygon();
 
-	void	computeNormal();
+	Rcolor&	getCs() { return Cs; };
+	Rpoint&	getN() { return N; };
 
 private:
 	unsigned int	points[3];
@@ -37,6 +38,8 @@ public:
 	void	computeNormals();
 	void	computeBoundingBox();
 	void	scale(float );
+	void	translate(Rpoint&);
+	void	preshade();
 
 	void	printBoundingBox();
 

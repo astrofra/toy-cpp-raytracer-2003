@@ -13,25 +13,10 @@
 Rpolygon::Rpolygon()
 {
 	memset(this, 0, sizeof(Rpolygon));
+	this->Cs = Rcolor(1.0f);
 }
 
 Rpolygon::~Rpolygon() {}
-
-//-------------------------------
-void	Rpolygon::computeNormal()
-//-------------------------------
-{
-	Rpoint a,b;
-
-	a = points[0] - points[1]; // get 2 arbitrary vectors from polygon
-	b = points[0] - points[2];
-
-	a.normalize();
-	b.normalize();
-
-	N = a % b; // cross product to get normal
-}
-
 
 //-------- Rmesh ------------------------
 
@@ -91,9 +76,22 @@ void	Rmesh::printBoundingBox()
 void	Rmesh::computeNormals()
 //-----------------------------
 {
+	Rpolygon	*current_poly;
+	Rpoint		v1,v2, n;
 	// for every polygon
 	for (int i = 0; i < this->polygon_count; i++)
-		this->polygon_table[i].computeNormal(); //current_poly.computeNormal();
+	{
+		current_poly = &(this->polygon_table[i]);
+		v1 = this->point_table[(*current_poly).points[1]] - this->point_table[(*current_poly).points[0]];
+		v2 = this->point_table[(*current_poly).points[2]] - this->point_table[(*current_poly).points[0]];
+		
+		v1.normalize();
+		v2.normalize();
+		n = v1 % v2;
+		n.normalize();
+
+		(*current_poly).N = n;
+	}
 }
 
 //------------------------------------------------------------------------
@@ -101,28 +99,26 @@ int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
 //------------------------------------------------------------------------
 {
     // calculate x planes interval
-    float tmin;
-    float tmax;
+    float tmin = -INTERSECTION_INFINITE;
+    float tmax = INTERSECTION_INFINITE;
 
     if (I.x>0) {
 
-        tmax = (-P.x+bounding_box_max.x) / I.x;
-        if (tmax<INTERSECTION_EPSILON) return 0;            
-        tmin = (-P.x+bounding_box_min.x) / I.x;
-        if (tmin<INTERSECTION_EPSILON) tmin = INTERSECTION_EPSILON;
+        float t = (-P.x+bounding_box_max.x) / I.x; //x max
+        if (t<tmin) return 0;  if (t<tmax) tmax = t;
+        t = (-P.x+bounding_box_min.x) / I.x; //x min
+        if (t>tmax) return 0;  if (t>tmin) tmin = t;
             
     } else if (I.x!=0) {
 
-        tmax = (-P.x+bounding_box_min.x) / I.x;
-        if (tmax<INTERSECTION_EPSILON) return 0;
-        tmin = (-P.x+bounding_box_max.x) / I.x;
-        if (tmin<INTERSECTION_EPSILON) tmin = INTERSECTION_EPSILON;
-
+        float t = (-P.x+bounding_box_min.x) / I.x; //x max
+        if (t<tmin) return 0;  if (t<tmax) tmax = t;
+        t = (-P.x+bounding_box_max.x) / I.x; //x min
+        if (t>tmax) return 0;  if (t>tmin) tmin = t;
+            
     } else {
-
+        
         if (P.x<bounding_box_min.x || P.x>bounding_box_max.x ) return 0;
-        tmin = INTERSECTION_EPSILON;
-        tmax = INTERSECTION_INFINITE;
         
     }
         
@@ -151,26 +147,27 @@ int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
     // calculate z planes interval
     if (I.z>0) {
 
-        float t = (-P.z+bounding_box_max.z) / I.z;  // z max
+        float t = (-P.z+bounding_box_max.z) / I.z; //z max
         if (t<tmin) return 0;  if (t<tmax) tmax = t;
-        t = (-P.z+bounding_box_min.z) / I.z;  // z min
+        t = (-P.z+bounding_box_min.z) / I.z; //z min
         if (t>tmax) return 0;  if (t>tmin) tmin = t;
             
-    } else if(I.z!=0) {
+    } else if (I.z!=0) {
 
-        float t = (-P.z+bounding_box_min.z) / I.z; // z max            
+        float t = (-P.z+bounding_box_min.z) / I.z; //z max
         if (t<tmin) return 0;  if (t<tmax) tmax = t;
-        t = (-P.z+bounding_box_max.z) / I.z; // z min
+        t = (-P.z+bounding_box_max.z) / I.z; //z min
         if (t>tmax) return 0;  if (t>tmin) tmin = t;
             
     } else {
         
-        if (P.z>bounding_box_min.z || P.z<bounding_box_max.z ) return 0;
+        if (P.z<bounding_box_min.z || P.z>bounding_box_max.z ) return 0;
         
     }
 	*/
 
     z_hit = tmin;
+
 	return 1;
 }
 
@@ -234,6 +231,17 @@ void	Rmesh::scale(float scale_factor)
 		for(int i = 0; i < this->point_count; i++){
 			point_table[i] *= scale_factor;	
 		}
+	}
+
+}
+
+//-------------------------------------------------------
+void	Rmesh::translate(Rpoint& T)
+//-------------------------------------------------------
+{
+	// for every point
+	for(int i = 0; i < this->point_count; i++){
+		point_table[i] += T;	
 	}
 
 }

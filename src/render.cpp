@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "math.h"
+#include "light.h"
 #include "list.h"
 #include "render.h"
 
@@ -52,8 +53,8 @@ Rrenderer::Rrenderer(int sx, int sy)
 	printf("Rrenderer::Rrenderer(%i, %i)\n", pixel_size_x, pixel_size_y);
 
 	meshes_list = 0;
-
-	ray_poly_hit = ray_poly_missed = 0;
+	lights_list = 0;
+	ray_poly_missed = ray_poly_hit = 0;
 }
 
 //---------------------
@@ -197,6 +198,23 @@ void Rrenderer::printBoundingBoxes()
 	}	
 }
 
+//----------------------------------
+void Rrenderer::translate(Rpoint &T)
+//----------------------------------
+{
+	Rmesh	*mesh;
+	
+	(*meshes_list).gotoListHead();
+
+	while((*meshes_list).gotoNextItem())
+	{
+		mesh = (Rmesh *)(*meshes_list).getContent();
+		(*mesh).translate(T);
+	}
+	printf("Rrenderer::translate(%f,%f,%f)\n", T.x,
+		T.y, T.z);
+}
+
 //----------------------------------------------------
 void Rrenderer::fitScene(float max_bounding_distance)
 //----------------------------------------------------
@@ -209,7 +227,7 @@ void Rrenderer::fitScene(float max_bounding_distance)
 
 	(*meshes_list).gotoListHead();
 
-	// evaluate bounding box surrounding the scene
+	// evaluate the global bounding box
 	while((*meshes_list).gotoNextItem())
 	{
 		mesh = (Rmesh *)(*meshes_list).getContent();
@@ -252,18 +270,44 @@ void Rrenderer::fitScene(float max_bounding_distance)
 	
 }
 
+//------------------------------------------------------------------------------------------------------
+void	Rrenderer::addLight(Rpoint position, Rcolor color, float intensity, float falloff, float radius)
+//------------------------------------------------------------------------------------------------------
+{
+	Rlight	*new_light;
+
+	if (lights_list == 0)
+		lights_list = new Rlist();
+
+	new_light = new Rlight(position);
+
+	(*new_light).setColor(color);
+	(*new_light).setIntensity(intensity);
+	(*new_light).setFalloff(falloff);
+	(*new_light).setRadius(radius);
+
+	(*lights_list).appendItem(new_light);
+}
 
 //------------------------------
-void	Rrenderer::renderScene()
+void	Rrenderer::renderScene(const int sampling_rate, const float sampling_threshold)
 //------------------------------
 {
 
-	int	x,y;
-	RrenderContext	projection_screen;
+	int		x,y,i;
+	float	xx, yy, last_pixel_luminance = 0.0f;
+	Rcolor	pixel;
 
-	projection_screen.P.z = 0.0;
-	projection_screen.I.x = projection_screen.I.y = 0.0;
-	projection_screen.I.z = 50.0;
+	float	sub_pixel_offset = 0.0025f, sub_pixel_weight = 1.0f / (float)sampling_rate;
+
+	RrenderContext	projection_screen,
+					trace_result;
+
+	projection_screen.P.z = 0.0f;
+	
+	projection_screen.I.x = 0.0f;
+	projection_screen.I.y = 0.0f;
+	projection_screen.I.z = -1.0f;
 
 	printf("Rrenderer::renderScene(), rendering ... ");
 
@@ -271,12 +315,41 @@ void	Rrenderer::renderScene()
 	{
 		printf("line %6i", y);
 
-		projection_screen.P.y = ((float)y / (float)pixel_size_y) + frame_top;
+		yy = ((float)y / (float)pixel_size_y) + frame_top;
 
 		for(x = 0; x < pixel_size_x; x++)
 		{
-			projection_screen.P.x = ((float)x / (float)pixel_size_x) + frame_left;
-			(*frame_buffer).putPixel(x, y, Trace(projection_screen));
+			xx = ((float)x / (float)pixel_size_x) + frame_left;
+			
+			memset(&pixel, 0, sizeof(pixel));
+
+			for(i = 0; i <= sampling_rate; i++)
+			{
+				projection_screen.P.x = xx + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+				projection_screen.P.y = yy + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+
+				if (traceRay(projection_screen,trace_result, false))
+				{
+					pixel += shadePoint(trace_result);
+				}
+				else
+				{
+					pixel += BACKGROUND_COLOR;
+				}
+
+				if ((i > 0) && (ABS_VALUE(last_pixel_luminance - pixel.luminance()) < sampling_threshold))
+				{
+					break;
+				}
+			}
+
+			if (i > 1)
+			{	pixel *= sub_pixel_weight; }
+			else
+			{	pixel.r *= (float)0.5f; 	pixel.g *= (float)0.5f; 	pixel.b *= (float)0.5f; }
+
+			last_pixel_luminance = pixel.luminance();
+			(*frame_buffer).putPixel(x, y, pixel);
 			
 		}
 
@@ -288,28 +361,19 @@ void	Rrenderer::renderScene()
 	printf("Rrenderer::renderScene(), ray casting accuracy : %f %% \n", ((float)ray_poly_hit * 100.0f) / (float)ray_poly_missed);
 }
 
-//-----------------------------
-void	Rrenderer::saveRender()
-//-----------------------------
-{
-	(*frame_buffer).saveFileTarga("out.tga");
-}
 
-
-//----------------------------------------------
-Rcolor	Rrenderer::Trace(RrenderContext& context)
-//----------------------------------------------
+//------------------------------------------------------------------------------------------
+int	Rrenderer::traceRay(RrenderContext& context, RrenderContext& result, bool is_shadow_ray)
+//------------------------------------------------------------------------------------------
 {
 	Rmesh		*current_mesh = 0,
 				*object_hit = 0;
 
 	Rpolygon	*current_polygon = 0;
 	
-	int			i;
+	int			i, polygon_hit = 0;
 	float		z_hit, z_BB_hit, 
 				z_hit_min = INTERSECTION_INFINITE; // INTERSECTION_EPSILON
-
-	//Rcolor		trace_result;
 
 	(*meshes_list).gotoListHead();
 	while((*meshes_list).gotoNextItem())
@@ -330,6 +394,7 @@ Rcolor	Rrenderer::Trace(RrenderContext& context)
 					// if intersection is clother to camera than previous one
 					if (z_hit < z_hit_min)
 					{
+						polygon_hit = i;
 						z_hit_min = z_hit;
 						object_hit = current_mesh;
 					}
@@ -344,15 +409,67 @@ Rcolor	Rrenderer::Trace(RrenderContext& context)
 		}
 	}
 
+
 	if (object_hit != 0)
 	{
-		// call shader
-		return Rcolor(1.0);
+		if (is_shadow_ray == false)
+		{
+			result.Cs	= (*object_hit).polygon_table[polygon_hit].getCs();
+			result.N	= (*object_hit).polygon_table[polygon_hit].getN();
+
+			result.P	= context.I;
+			result.P	*= z_hit;
+		}
+
+		return 1;
 	}
 	else
 	{
-		return Rcolor(BACKGROUND_COLOR);
+		return 0;
 	}
+}
+
+//----------------------------------------------------
+Rcolor	Rrenderer::shadePoint(RrenderContext &context)
+//----------------------------------------------------
+{
+	Rlight	*current_light;
+	float	Cl;
+	Rcolor	Ci = Rcolor(0.0f), Ct;
+	// initialise Color buffer
+
+	(*lights_list).gotoListHead();
+
+	// for each light
+	while((*lights_list).gotoNextItem())
+	{
+		current_light = (Rlight *)(*lights_list).getContent();
+
+		// diffusion pass
+		Cl = context.N * (*current_light).getLightDirection(context.P);
+		
+		if (Cl > 0.0f)
+		{
+			Ct = context.Cs;
+			Ct *= (*current_light).getColor();
+			Ct *= (*current_light).getIntensity();
+			Ct *= Cl;
+
+			// shadow pass
+
+			// Add to Color Buffer
+			Ci += Ct;
+		}
+	}
+
+	return Ci;
+}
+
+//-----------------------------
+void	Rrenderer::saveRender()
+//-----------------------------
+{
+	(*frame_buffer).saveFileTarga("out.tga");
 }
 
 

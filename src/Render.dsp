@@ -122,6 +122,10 @@ SOURCE=.\gfxBuffer.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\light.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\list.cpp
 # End Source File
 # Begin Source File
@@ -147,6 +151,10 @@ SOURCE=.\geometry.h
 # Begin Source File
 
 SOURCE=.\gfxBuffer.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\light.h
 # End Source File
 # Begin Source File
 
