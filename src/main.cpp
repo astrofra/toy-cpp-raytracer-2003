@@ -38,7 +38,7 @@ void main(int argc, char* argv[])
 	(*renderer).addLight(Rpoint(0.0f, -0.5f, 2.5f), Rcolor(0.8f, 0.8f, 0.8f), 0.35f);
 	
 	// render objects
-	(*renderer).renderScene(8,0.2f);
+	(*renderer).renderScene(4,0.2f);
 
 	(*renderer).saveRender();
 

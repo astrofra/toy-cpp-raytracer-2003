@@ -21,6 +21,29 @@ unsigned char	floatToUnsignedChar(float);
 
 float			unsignedCharToFloat(unsigned char);
 
+float			floatQuasiRandom(float range);
+int				intQuasiRandom(int range);
+
+//-------- Quasi Random ------------------
+/*
+class QuasiRandom
+{
+public:
+	QuasiRandom();
+	~QuasiRandom();
+
+	int		getIntQuasiRandom(int& range);
+	float	getFloatQuasiRandom(float& range);
+	int		gotoNextRand();
+
+//private:
+	int		rand_index;
+	int		rand_table_size = 0; //115;
+	char	rand_table = 0; //"0128756413024718048181761743015748471741217385132018459171465198190812801798581908967950147818314709819210897615148";
+
+}
+*/
+
 //-------- Rpoint ------------------------
 
 class Rpoint

@@ -294,7 +294,8 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 //------------------------------
 {
 
-	int		x,y,i;
+	int		x,y,i,
+			grid_x, grid_y;
 	float	xx, yy, last_pixel_luminance = 0.0f;
 	Rcolor	pixel;
 
@@ -323,34 +324,64 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 			
 			memset(&pixel, 0, sizeof(pixel));
 
-			for(i = 0; i <= sampling_rate; i++)
+			if (sampling_rate >= 0)
 			{
-				projection_screen.P.x = xx + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
-				projection_screen.P.y = yy + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
 
-				if (traceRay(projection_screen,trace_result, false))
+				for(i = 0; i <= sampling_rate; i++)
 				{
-					pixel += shadePoint(trace_result);
+					projection_screen.P.x = xx + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+					projection_screen.P.y = yy + RAND(sub_pixel_offset) - RAND(sub_pixel_offset);
+
+					if (traceRay(projection_screen,trace_result, false))
+					{
+						pixel += shadePoint(trace_result);
+					}
+					else
+					{
+						pixel += BACKGROUND_COLOR;
+					}
+
+					if ((i > 0) && (ABS_VALUE(last_pixel_luminance - pixel.luminance()) < sampling_threshold))
+					{
+						break;
+					}
 				}
+
+				if (i > 1)
+				{	pixel *= sub_pixel_weight; }
 				else
-				{
-					pixel += BACKGROUND_COLOR;
-				}
+				{	pixel.r *= (float)0.5f; 	pixel.g *= (float)0.5f; 	pixel.b *= (float)0.5f; }
 
-				if ((i > 0) && (ABS_VALUE(last_pixel_luminance - pixel.luminance()) < sampling_threshold))
-				{
-					break;
-				}
+				last_pixel_luminance = pixel.luminance();
 			}
-
-			if (i > 1)
-			{	pixel *= sub_pixel_weight; }
 			else
-			{	pixel.r *= (float)0.5f; 	pixel.g *= (float)0.5f; 	pixel.b *= (float)0.5f; }
+			{
+					projection_screen.P.x = xx;
+					projection_screen.P.y = yy;
 
-			last_pixel_luminance = pixel.luminance();
-			(*frame_buffer).putPixel(x, y, pixel);
+					grid_x = (x / sampling_rate) * sampling_rate;
+					grid_y = (y / sampling_rate) * sampling_rate;
+
+					if (x == grid_x && y == grid_y)
+					{
+						if (traceRay(projection_screen,trace_result, false))
+						{
+							pixel += shadePoint(trace_result);
+						}
+						else
+						{
+							pixel += BACKGROUND_COLOR;
+						}
+					}
+					else
+					{
+						pixel = (*frame_buffer).getPixel(grid_x, grid_y);
+					}
+
+
+			}
 			
+		(*frame_buffer).putPixel(x, y, pixel); // put pixel result
 		}
 
 		printf("\b\b\b\b\b\b\b\b\b\b\b");
