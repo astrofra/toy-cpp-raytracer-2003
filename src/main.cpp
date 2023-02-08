@@ -77,6 +77,7 @@ void render(SDL_Surface *sdl_buffer)
 	Rlist	filename_list;
 
 	// setup list of objects files ("scene")	
+	//filename_list.appendItem("F:\\fra\\DEV\\datas\\cubes_scatter.obj");
 	filename_list.appendItem("F:\\fra\\DEV\\datas\\lo_head.obj");
 	
 
@@ -84,24 +85,24 @@ void render(SDL_Surface *sdl_buffer)
 	renderer = new Rrenderer(512,512);
 
 	// load files to new objects
-	(*renderer).loadFiles(filename_list);
+	renderer->loadFiles(filename_list);
 
-	(*renderer).computeNormals();
-	(*renderer).computeBoundingBoxes();
-	(*renderer).fitScene(0.75f);
+	renderer->computeNormals();
+	renderer->computeBoundingBoxes();
+	renderer->fitScene(0.75f);
 	//(*renderer).translate(Rpoint(0.0, -0.15f, 0.0));
-	(*renderer).computeBoundingBoxes();
+	renderer->computeBoundingBoxes();
 
-	(*renderer).addLight(Rpoint(0.0f, 5.0f, 2.5f), Rcolor(1.0f), 0.5f);
-	(*renderer).addLight(Rpoint(-5.0f, 5.0f, -2.5f), Rcolor(0.15f, 0.45f, 0.75f), 0.8f);
+	renderer->addLight(Rpoint(0.0f, 5.0f, 2.5f), Rcolor(1.0f), 0.5f);
+	renderer->addLight(Rpoint(-5.0f, 5.0f, -2.5f), Rcolor(0.15f, 0.45f, 0.75f), 0.8f);
 	//(*renderer).addLight(Rpoint(0.0f, -0.5f, 2.5f), Rcolor(1.0f, 0.65f, 0.2f), 0.35f);
 
-	(*renderer).addAmbiantLight(Rcolor(0.8f,0.2f,0.0f), 0.5f);
+	renderer->addAmbiantLight(Rcolor(0.8f,0.2f,0.0f), 0.5f);
 	
 	// render objects
-	(*renderer).renderScene(2 ,0.8f, sdl_buffer);
+	renderer->renderScene(-4 ,0.8f, sdl_buffer);
 
-	(*renderer).saveRender();
+	renderer->saveRender();
 
 	//(*renderer).saveFiles();
 

@@ -12,6 +12,7 @@ class Rpolygon
 public:
 	Rpolygon();
 	~Rpolygon();
+	int getPoint(int i) { return points[i]; };
 
 	Rcolor&	getCs() { return Cs; };
 	Rpoint&	getN() { return N; };
@@ -43,9 +44,6 @@ public:
 	void	preshade();
 
 	void	printBoundingBox();
-
-	int		RayIntersectPoly(Rpoint& , Rpoint& , int&, float&);
-	int		RayIntersectBoundingBox(Rpoint& , Rpoint&, float&);
 
 	// datas
 	int			point_count;

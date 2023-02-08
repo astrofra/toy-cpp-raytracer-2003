@@ -122,6 +122,10 @@ SOURCE=.\math.cpp
 
 SOURCE=.\render.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\trace.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
@@ -149,6 +153,10 @@ SOURCE=.\math.h
 # Begin Source File
 
 SOURCE=.\render.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\trace.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"

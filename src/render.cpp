@@ -8,6 +8,7 @@
 #include "light.h"
 #include "list.h"
 #include "render.h"
+#include "trace.h"
 
 //-------- RrenderContext ------------------------
 
@@ -431,19 +432,27 @@ int	Rrenderer::traceRay(RrenderContext& context, RrenderContext& result, bool is
 	float		z_hit, z_BB_hit, 
 				z_hit_min = INTERSECTION_INFINITE; // INTERSECTION_EPSILON
 
+
 	(*meshes_list).gotoListHead();
 	while((*meshes_list).gotoNextItem())
 	{
 		current_mesh = (Rmesh *)(*meshes_list).getContent();
 
 		// if ray hits object's bouding box
-		if ((*current_mesh).RayIntersectBoundingBox(context.P, context.I, z_BB_hit))
+		if (RayIntersectBoundingBox(context.P, context.I, 
+			(*current_mesh).bounding_box_min, 
+			(*current_mesh).bounding_box_max,
+			z_BB_hit))
 		{
 			// for every polygons
 			for(i = 0; i < (*current_mesh).polygon_count; i++)
 			{
 				// if ray hits polygon
-				if ((*current_mesh).RayIntersectPoly(context.P, context.I, i, z_hit))
+				if (RayIntersectPoly(context.P, context.I,
+					(*current_mesh).point_table[(*current_mesh).polygon_table[i].getPoint(0)],
+					(*current_mesh).point_table[(*current_mesh).polygon_table[i].getPoint(1)],
+					(*current_mesh).point_table[(*current_mesh).polygon_table[i].getPoint(2)],
+					z_hit))
 				{
 					ray_poly_hit++;
 
@@ -518,18 +527,18 @@ Rcolor	Rrenderer::shadePoint(RrenderContext &context)
 		{
 			Cl = context.N * (*current_light).getLightDirection(context.P);
 
-			/* // shadow pass
+			// shadow pass
 			temp_cast.P = context.P;
 			temp_cast.I = (*current_light).getLightDirection(context.P);
-			shadow_cast.P = context.P.x - shadow_cast.I.x * 0.001f;
+			/*shadow_cast.P = context.P.x - shadow_cast.I.x * 0.001f;
 			shadow_cast.P = context.P.y - shadow_cast.I.y * 0.001f;
-			shadow_cast.P = context.P.z - shadow_cast.I.z * 0.001f;
+			shadow_cast.P = context.P.z - shadow_cast.I.z * 0.001f;*/
 
 			if (traceRay(temp_cast,temp_cast_result,true))
 			{
 				Ct = 0.0f;
 			}
-			else*/
+			else
 			{
 
 				if (Cl > 0.0f)

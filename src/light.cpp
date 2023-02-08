@@ -37,7 +37,7 @@ Rlight::~Rlight() {};
 Rpoint &Rlight::getLightDirection(Rpoint &P)
 //------------------------------------------
 {
-	static Rpoint	L;
+	Rpoint	L;
 
 	switch (type)
 	{
