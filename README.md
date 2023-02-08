@@ -2,6 +2,7 @@
 
 This is a super old project, probably my first real C++ project ever. Can load an .OBJ file and raytrace it.<br>
 The initial version was only able to trace spheres with a color and specular attribute. The specular reflections were most probably wrong.<br>
+A couple of days later, it slowly evolved into a polygon raytracer than can load and render .OBJ files.<br>
 _It is presented here for archival purpose only._<br>
 <br>
 The original comment says:
@@ -20,3 +21,5 @@ The original comment says:
 ### Rendering examples
 
 ![raytraced spheres](img/trace-spheres-2003.png)
+<br>
+![raytraced geometry](img/trace-polygons-2005.png)
