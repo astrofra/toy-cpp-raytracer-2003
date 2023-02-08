@@ -5,55 +5,37 @@
 #ifndef	GEOMETRY
 #define	GEOMETRY
 
-//-------- Rpolygon ------------------------
+//-------- Rsphere ------------------------
 
-class Rpolygon
+class Rsphere
 {
-public:
-	Rpolygon();
-	~Rpolygon();
+public :
+	Rsphere();
+	~Rsphere();
 
-	Rcolor&	getCs() { return Cs; };
-	Rpoint&	getN() { return N; };
-
-private:
-	unsigned int	points[3];
-	Rpoint			N;		//	surface geometric normal
-	Rcolor			Cs;		//  surface color
-
-	friend class Rmesh;
+	float	x, y, z;
+	float	radius;
+	Rcolor	color;
+	float	reflection;
 };
 
-//-------- Rmesh ------------------------
+//-------- Robject ------------------------
 
-class Rmesh
+class Robject
 {
 public:
-	Rmesh();
-	~Rmesh();
+	Robject();
+	~Robject();
 
-	int		loadFileWavefront(char *);
-	int		saveFileWavefront(char *);
+	int		loadFileCSG(char *);
+	int		saveFileCSG(char *);
 
-	void	computeNormals();
-	void	computeBoundingBox();
 	void	scale(float );
 	void	translate(Rpoint&);
-	void	preshade();
-
-	void	printBoundingBox();
-
-	int		RayIntersectPoly(Rpoint& , Rpoint& , int&, float&);
-	int		RayIntersectBoundingBox(Rpoint& , Rpoint&, float&);
 
 	// datas
-	int			point_count;
-	int			polygon_count;
-		
-	Rpoint		*point_table;
-	Rpolygon	*polygon_table;
-
-	Rpoint		bounding_box_min, bounding_box_max;
+	int		count;		
+	Rsphere	*sphere_table;
 };
 
 #endif

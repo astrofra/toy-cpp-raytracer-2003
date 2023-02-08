@@ -8,28 +8,27 @@
 #include "math.h"
 #include "geometry.h"
 
-//-------- Rpolygon ------------------------
+//-------- Rsphere ------------------------
 
-Rpolygon::Rpolygon()
+Rsphere::Rsphere()
 {
-	memset(this, 0, sizeof(Rpolygon));
-	this->Cs = Rcolor(1.0f);
+	memset(this, 0, sizeof(Rsphere));
 }
 
-Rpolygon::~Rpolygon() {}
+Rsphere::~Rsphere() {}
 
-//-------- Rmesh ------------------------
+//-------- Robject ------------------------
 
 //------------
-Rmesh::Rmesh()
+Robject::Robject()
 //------------
 {
-	memset(this, 0, sizeof(Rmesh));
+	memset(this, 0, sizeof(Robject));
 }
 
 
 //-------------
-Rmesh::~Rmesh()
+Robject::~Robject()
 //-------------
 {
 	/*
@@ -41,59 +40,7 @@ Rmesh::~Rmesh()
 	*/
 }
 
-//---------------------------------
-void	Rmesh::computeBoundingBox()
-//---------------------------------
-{
-	bounding_box_min = Rpoint(INTERSECTION_INFINITE);
-	bounding_box_max = Rpoint(-INTERSECTION_INFINITE);
-
-	// for every point
-	for(int i = 0; i < this->point_count; i++)
-	{
-		// search for min & max
-		bounding_box_min.x = MIN_VALUE(this->point_table[i].x, bounding_box_min.x);
-		bounding_box_min.y = MIN_VALUE(this->point_table[i].y, bounding_box_min.y);
-		bounding_box_min.z = MIN_VALUE(this->point_table[i].z, bounding_box_min.z);
-
-		bounding_box_max.x = MAX_VALUE(this->point_table[i].x, bounding_box_max.x);
-		bounding_box_max.y = MAX_VALUE(this->point_table[i].y, bounding_box_max.y);
-		bounding_box_max.z = MAX_VALUE(this->point_table[i].z, bounding_box_max.z);
-	}
-
-}
-
-//---------------------------------
-void	Rmesh::printBoundingBox()
-//---------------------------------
-{
-	printf("Rmesh::printBoundingBox()\n   min(%f, %f, %f) / max(%f, %f, %f)\n", 
-		bounding_box_min.x, bounding_box_min.y, bounding_box_min.z,
-		bounding_box_max.x, bounding_box_max.y, bounding_box_max.z);
-}
-
-//-----------------------------
-void	Rmesh::computeNormals()
-//-----------------------------
-{
-	Rpolygon	*current_poly;
-	Rpoint		v1,v2, n;
-	// for every polygon
-	for (int i = 0; i < this->polygon_count; i++)
-	{
-		current_poly = &(this->polygon_table[i]);
-		v1 = this->point_table[(*current_poly).points[1]] - this->point_table[(*current_poly).points[0]];
-		v2 = this->point_table[(*current_poly).points[2]] - this->point_table[(*current_poly).points[0]];
-		
-		v1.normalize();
-		v2.normalize();
-		n = v1 % v2;
-		n.normalize();
-
-		(*current_poly).N = n;
-	}
-}
-
+/*
 //------------------------------------------------------------------------
 int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
 //------------------------------------------------------------------------
@@ -143,7 +90,6 @@ int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
         
     }
         
-	/*
     // calculate z planes interval
     if (I.z>0) {
 
@@ -164,12 +110,15 @@ int		Rmesh::RayIntersectBoundingBox(Rpoint& P, Rpoint& I, float& z_hit)
         if (P.z<bounding_box_min.z || P.z>bounding_box_max.z ) return 0;
         
     }
-	*/
 
     z_hit = tmin;
 
 	return 1;
 }
+
+  */
+
+/*
 
 
 //---------------------------------------------------------------------------------------
@@ -221,9 +170,11 @@ int		Rmesh::RayIntersectPoly(Rpoint& P, Rpoint& I, int& index_polygon, float& z_
    return 1;
 }
 
+  */
+
 
 //--------------------------------------
-void	Rmesh::scale(float scale_factor)
+void	Robject::scale(float scale_factor)
 //--------------------------------------
 {
 	// for every point
@@ -236,7 +187,7 @@ void	Rmesh::scale(float scale_factor)
 }
 
 //-------------------------------------------------------
-void	Rmesh::translate(Rpoint& T)
+void	Robject::translate(Rpoint& T)
 //-------------------------------------------------------
 {
 	// for every point
@@ -248,7 +199,7 @@ void	Rmesh::translate(Rpoint& T)
 
 
 //-------------------------------------------
-int		Rmesh::loadFileWavefront(char *fname)
+int		Robject::loadFileCSG(char *fname)
 //-------------------------------------------
 // load simplified lightwave's obj export (no vertex normal, no uv coords)
 {
@@ -401,7 +352,7 @@ int		Rmesh::loadFileWavefront(char *fname)
 
 // dump geometry to an extremelly simplified obj file
 //-------------------------------------------
-int		Rmesh::saveFileWavefront(char *fname)
+int		Rmesh::saveFileCSG(char *fname)
 //-------------------------------------------
 {
 	// open Wavefront .obj file

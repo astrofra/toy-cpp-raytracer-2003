@@ -298,7 +298,7 @@ void	Rrenderer::renderScene(const int sampling_rate, const float sampling_thresh
 	float	xx, yy, last_pixel_luminance = 0.0f;
 	Rcolor	pixel;
 
-	float	sub_pixel_offset = 0.0025f, sub_pixel_weight = 1.0f / (float)sampling_rate;
+	float	sub_pixel_offset = 0.001f, sub_pixel_weight = 1.0f / (float)sampling_rate;
 
 	RrenderContext	projection_screen,
 					trace_result;
